@@ -1,6 +1,9 @@
 <template>
   <div id="app">
     <canvas id="gameCanvas" width="1000" height="400"></canvas>
+    <div id="options">
+      <button @click="start()" ref="startBtn">Başlat</button>
+    </div>
   </div>
 </template>
 
@@ -13,21 +16,20 @@ export default {
     return {
       canvas: null,
       ctx: null,
-
       ballX: null,
       ballY: null,
       ballSpeedX: 5,
       ballSpeedY: -5,
       ballRadius: 15,
       paddleHeight: 10,
-      paddleWidth: 75,
+      paddleWidth: 120,
       paddleX: null,
       paddleY: null,
       rightPresses: false,
       leftPresses: false,
       brickRowCount: 3,
-      brickColumnCount: 10,
-      brickWidth: 75,
+      brickColumnCount: 16,
+      brickWidth: 50,
       brickHeight: 20,
       brickPadding: 10,
       brickOffsetTop: 30,
@@ -39,7 +41,8 @@ export default {
       paused: true,
       bricks: [],
       ball: null,
-      brickColors:[
+      isGameOver: false,
+      brickColors: [
         {
           color1: "#00f260",
           color2: "#0575e6"
@@ -82,14 +85,49 @@ export default {
   },
 
   methods: {
+    start() {
+      if (!this.isGameOver) {
+        if (this.paused) {
+          this.$refs["startBtn"].innerText = "Duraklat";
+          this.paused = false;
+          this.draw();
+        } else {
+          this.$refs["startBtn"].innerText = "Başlat";
+          this.paused = true;
+        }
+      } else {
+        this.$refs["startBtn"].innerText = "Duraklat";
+        this.isGameOver = false;
+        this.paused = false;
+        this.resetGameData();
+      }
+    },
+    resetGameData() {
+      this.level = 1;
+      this.score = 0;
+      this.lives = 3;
+      this.ballSpeedX = 5;
+      this.ballSpeedY = 5;
+      this.setPaddleLocation();
+      this.setBallLocation();
+      this.initBricks();
+      this.draw();
+    },
+
+    checkGameOver() {
+      return;
+    },
     setBallImage() {
       this.ball = new Image();
       this.ball.src = ballImage;
     },
+    generateRandomNumber() {
+      return Math.floor(Math.random() * 21) - 10;
+    },
     setBallLocation() {
-      this.ballX = this.canvas.width / 2 + Math.floor(Math.random() * 21) - 10;
-      this.ballY =
-        this.canvas.height - 30 + Math.floor(Math.random() * 21) - 10;
+      this.generateRandomNumber();
+      this.ballX = this.canvas.width / 2 + this.generateRandomNumber();
+      this.ballY = this.canvas.height - 30;
     },
     setPaddleLocation() {
       this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
@@ -140,30 +178,29 @@ export default {
           this.ballSpeedY = -this.ballSpeedY;
         } else {
           this.lives--;
-          if (!this.lives) {
-            //alert("game over!");
-            //  location.reload();
-
-            this.ballSpeedX += 1;
-            this.ballSpeedY = -this.ballSpeedY;
-            this.ballSpeedY -= 1;
-            this.ballX =
-              this.canvas.width / 2 + Math.floor(Math.random() * 21) - 10;
-            this.ballY =
-              this.canvas.height - 30 + Math.floor(Math.random() * 21) - 10;
-            this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+          if (this.lives > 0) {
             this.paused = true;
+            this.ballSpeedY = -this.ballSpeedY;
+            this.setBallLocation();
+            this.setPaddleLocation();
+
+            this.drawMessage("#d32f2f", "Kalan Hakkınız:" + this.lives);
+
+            setTimeout(() => {
+              this.draw();
+              this.paused = true;
+            }, 1000);
 
             setTimeout(() => {
               this.paused = false;
+              console.log("devam");
               this.draw();
-            }, 3000);
+            }, 2000);
           } else {
-            this.ballX =
-              this.canvas.width - 2 + Math.floor(Math.random() * 21) - 10;
-            this.ballY =
-              this.canvas.height - 30 + Math.floor(Math.random() * 21) - 10;
-            this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+            this.$refs["startBtn"].innerText = "Yeniden Oyna";
+            this.paused = true;
+            this.isGameOver = true;
+            this.drawMessage("#d32f2f", "Oyunu Kaybettiniz:" + this.lives);
           }
         }
       }
@@ -210,7 +247,8 @@ export default {
             this.ctx.beginPath();
             this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
 
-            this.ctx.fillStyle = this.getRandomColor();
+            //   this.ctx.fillStyle = this.getRandomColor();
+            this.ctx.fillStyle = "#fdbb2d";
             this.ctx.fill();
             this.ctx.closePath();
           }
@@ -305,27 +343,14 @@ export default {
                   this.ballSpeedX += 1;
                   this.ballSpeedY = -this.ballSpeedY;
                   this.ballSpeedY -= 1;
-                  this.ballX =
-                    this.canvas.width - 2 + Math.floor(Math.random() * 21) - 10;
-                  this.ballY =
-                    this.canvas.height -
-                    30 +
-                    Math.floor(Math.random() * 21) -
-                    10;
-                  this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+                  this.setBallLocation();
+                  this.setPaddleLocation();
                   this.paused = true;
-                  this.ctx.beginPath();
-                  this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-                  this.ctx.fillStyle = "#0095DD";
-                  this.ctx.fill();
-                  this.ctx.font = "16px Arial";
-                  this.ctx.fillStyle = "#FFFFFF";
-                  this.ctx.fillText(
+                  this.drawMessage(
+                    "#d32f2f",
                     "Level " +
                       (this.level - 1) +
-                      " completed,starting next level...",
-                    110,
-                    150
+                      " Tamamlandı.Sonraki Level'e geçiş yapılıyor..."
                   );
                   setTimeout(() => {
                     this.paused = false;
@@ -338,6 +363,21 @@ export default {
         }
       }
     },
+    drawMessage(color, message) {
+      this.ctx.beginPath();
+      /*
+      this.ctx.rect(0, 0, 300, 100);
+      this.ctx.fillStyle = color;
+      this.ctx.fill();
+      */
+      this.ctx.font = "24px Arial";
+      this.ctx.fillStyle = "#FFFFFF";
+      this.ctx.fillText(
+        message,
+        this.canvas.width / 2 - 75,
+        this.canvas.height / 2 - 15
+      );
+    },
     drawScore() {
       this.ctx.font = "16px Arial";
       this.ctx.fillStyle = "#FFFFFF";
@@ -345,10 +385,14 @@ export default {
     },
 
     drawLives() {
+      this.ctx.font = "16px Arial";
+      this.ctx.fillStyle = "#FFFFFF";
       this.ctx.fillText("Lives:" + this.lives, this.canvas.width - 65, 20);
     },
     drawLevel() {
-      this.ctx.fillText("Level:" + this.level, 210, 20);
+      this.ctx.font = "16px Arial";
+      this.ctx.fillStyle = "#FFFFFF";
+      this.ctx.fillText("Level:" + this.level, this.canvas.width / 2 - 30, 20);
     }
   }
 };
@@ -378,5 +422,22 @@ body {
   display: block;
   margin: 0 auto;
   cursor: pointer;
+}
+#options {
+  margin-top: 1em;
+  display: flex;
+  justify-content: center;
+}
+#options button {
+  width: 8em;
+  height: 3em;
+  background: rgb(66, 184, 221);
+  border: none;
+  border-radius: 1em;
+  outline: none;
+  cursor: pointer;
+}
+#options button:not(:first-child) {
+  margin-left: 1em;
 }
 </style>
