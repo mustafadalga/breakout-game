@@ -72,6 +72,14 @@ export default {
         {
           color1: "#000000",
           color2: "#0f9b0f"
+        },
+        {
+          color1:"#ff8235",
+          color2:"#30e8bf",
+        },
+          {
+          color1:"#f7971e",
+          color2:"#ffd200",
         }
       ]
     };
@@ -156,7 +164,7 @@ export default {
       for (var c = 0; c < this.brickColumnCount; c++) {
         this.bricks[c] = [];
         for (var r = 0; r < this.brickRowCount; r++) {
-          this.bricks[c][r] = { x: 0, y: 0, status: 1 };
+          this.bricks[c][r] = { x: 0, y: 0, status: 1,color:this.getRandomColor() };
         }
       }
     },
@@ -258,8 +266,8 @@ export default {
             this.ctx.beginPath();
             this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
 
-            //   this.ctx.fillStyle = this.getRandomColor();
-            this.ctx.fillStyle = "#fdbb2d";
+             this.ctx.fillStyle = this.bricks[columnIndex][rowIndex].color
+            //this.ctx.fillStyle = "#fdbb2d";
             this.ctx.fill();
             this.ctx.closePath();
           }
@@ -330,16 +338,16 @@ export default {
         columnIndex++
       ) {
         for (let rowIndex = 0; rowIndex < this.brickRowCount; rowIndex++) {
-          var b = this.bricks[columnIndex][rowIndex];
-          if (b.status === 1) {
+          var brick = this.bricks[columnIndex][rowIndex];
+          if (brick.status === 1) {
             if (
-              this.ballX > b.x &&
-              this.ballX < b.x + this.brickWidth &&
-              this.ballY > b.y &&
-              this.ballY < b.y + this.brickHeight
+              this.ballX > brick.x &&
+              this.ballX < brick.x + this.brickWidth &&
+              this.ballY > brick.y &&
+              this.ballY < brick.y + this.brickHeight
             ) {
               this.ballSpeedY = -this.ballSpeedY;
-              b.status = 0;
+              brick.status = 0;
               this.score++;
 
               this.playBrickSound();
