@@ -9,6 +9,7 @@
 
 <script>
 import ballImage from "./assets/img/football-ball.png";
+import BrickSoundEffeck from "./assets/sound/2.mp3";
 
 export default {
   name: "Home",
@@ -42,6 +43,7 @@ export default {
       bricks: [],
       ball: null,
       isGameOver: false,
+      brickSound: null,
       brickColors: [
         {
           color1: "#00f260",
@@ -75,6 +77,7 @@ export default {
     };
   },
   mounted() {
+    this.setSoundFile();
     this.setBallImage();
     this.getCanvasObject();
     this.setPaddleLocation();
@@ -113,9 +116,15 @@ export default {
       this.initBricks();
       this.draw();
     },
-
-    checkGameOver() {
-      return;
+    setSoundFile() {
+      this.brickSound = new Audio(BrickSoundEffeck);
+    },
+    playBrickSound() {
+      if (this.brickSound.paused) {
+        this.brickSound.play();
+      } else {
+        this.brickSound.currentTime = 0;
+      }
     },
     setBallImage() {
       this.ball = new Image();
@@ -178,6 +187,7 @@ export default {
           this.ballSpeedY = -this.ballSpeedY;
         } else {
           this.lives--;
+          
           if (this.lives > 0) {
             this.paused = true;
             this.ballSpeedY = -this.ballSpeedY;
@@ -193,14 +203,14 @@ export default {
 
             setTimeout(() => {
               this.paused = false;
-              console.log("devam");
+              
               this.draw();
             }, 2000);
           } else {
             this.$refs["startBtn"].innerText = "Yeniden Oyna";
             this.paused = true;
             this.isGameOver = true;
-            this.drawMessage("#d32f2f", "Oyunu Kaybettiniz:" + this.lives);
+            this.drawMessage("#d32f2f", "Oyunu Kaybettiniz");
           }
         }
       }
@@ -330,6 +340,9 @@ export default {
               this.ballSpeedY = -this.ballSpeedY;
               b.status = 0;
               this.score++;
+
+              this.playBrickSound();
+
               if (this.score === this.brickRowCount * this.brickColumnCount) {
                 if (this.level === this.maxLevel) {
                   alert("You Win,congratilations");
