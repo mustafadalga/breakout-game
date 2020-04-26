@@ -186,8 +186,9 @@ export default {
         ) {
           this.ballSpeedY = -this.ballSpeedY;
         } else {
-          this.lives--;
-          
+          if(this.lives>0){
+            this.lives--;
+          }
           if (this.lives > 0) {
             this.paused = true;
             this.ballSpeedY = -this.ballSpeedY;
@@ -200,15 +201,15 @@ export default {
               this.draw();
               this.paused = true;
             }, 1000);
-
             setTimeout(() => {
               this.paused = false;
-              
               this.draw();
             }, 2000);
           } else {
             this.$refs["startBtn"].innerText = "Yeniden Oyna";
-            this.paused = true;
+            setTimeout(() => {
+              this.paused = true;
+            }, 100);
             this.isGameOver = true;
             this.drawMessage("#d32f2f", "Oyunu Kaybettiniz");
           }
@@ -349,7 +350,6 @@ export default {
                   document.location.reload();
                 } else {
                   this.level++;
-                  //start the next level
                   this.brickRowCount++;
                   this.initBricks();
                   this.score = 0;
@@ -378,11 +378,6 @@ export default {
     },
     drawMessage(color, message) {
       this.ctx.beginPath();
-      /*
-      this.ctx.rect(0, 0, 300, 100);
-      this.ctx.fillStyle = color;
-      this.ctx.fill();
-      */
       this.ctx.font = "24px Arial";
       this.ctx.fillStyle = "#FFFFFF";
       this.ctx.fillText(
@@ -394,18 +389,18 @@ export default {
     drawScore() {
       this.ctx.font = "16px Arial";
       this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Score:" + this.score, 8, 20);
+      this.ctx.fillText("Skor:" + this.score, 8, 20);
     },
 
     drawLives() {
       this.ctx.font = "16px Arial";
       this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Lives:" + this.lives, this.canvas.width - 65, 20);
+      this.ctx.fillText("Hak:" + this.lives, this.canvas.width - 65, 20);
     },
     drawLevel() {
       this.ctx.font = "16px Arial";
       this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Level:" + this.level, this.canvas.width / 2 - 30, 20);
+      this.ctx.fillText("Seviye:" + this.level, this.canvas.width / 2 - 30, 20);
     }
   }
 };
