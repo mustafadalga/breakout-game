@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <canvas id="gameCanvas" width="1000" height="400"></canvas>
+    <canvas id="gameCanvas" :width="canvasWidth" :height="canvasHeight"></canvas>
     <div id="options">
-      <button type="button" class="btn btn-info btn-lg btn3d"  @click="start()" ref="startBtn">Başlat</button>
+      <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat</button>
     </div>
   </div>
 </template>
@@ -16,6 +16,8 @@ export default {
   data() {
     return {
       canvas: null,
+      canvasWidth: 1000,
+      canvasHeight: 400,
       ctx: null,
       ballX: null,
       ballY: null,
@@ -30,11 +32,12 @@ export default {
       leftPresses: false,
       brickRowCount: 3,
       brickColumnCount: 16,
-      brickWidth: 50,
       brickHeight: 25,
+      minBrickWidth: 30,
+      maxBrickWidth: 60,
       brickPadding: 10,
       brickOffsetTop: 30,
-      brickOffsetLeft: 30,
+      brickOffsetLeft: 10,
       score: 0,
       lives: 3,
       level: 1,
@@ -85,6 +88,7 @@ export default {
     };
   },
   mounted() {
+
     this.setSoundFile();
     this.setBallImage();
     this.getCanvasObject();
@@ -142,29 +146,45 @@ export default {
       return Math.floor(Math.random() * 21) - 10;
     },
     generateRandomBrickWidth() {
-      let min = 30,
-        max = 60;
-      return Math.floor(Math.random() * (max - min + 1) + min);
+      return Math.floor(
+        Math.random() * (this.maxBrickWidth - this.minBrickWidth + 1) +
+          this.minBrickWidth
+      );
     },
     setBallLocation() {
-      this.ballX = this.canvas.width / 2 + this.generateRandomBallXNumber();
+      this.ballX = this.canvasWidth / 2 + this.generateRandomBallXNumber();
       this.ballY = this.canvas.height - 30;
     },
     setPaddleLocation() {
-      this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+      this.paddleX = (this.canvasWidth - this.paddleWidth) / 2;
       this.paddleY = this.canvas.height - this.paddleHeight;
     },
     getCanvasObject() {
       this.canvas = document.getElementById("gameCanvas");
       this.ctx = this.canvas.getContext("2d");
     },
-    setBall() {},
+ 
     addEventListener() {
       document.addEventListener("keydown", this.keyDownHandler);
       document.addEventListener("keyup", this.keyUpHandler);
       document.addEventListener("mousemove", this.mouseMoveHandler);
+      window.addEventListener("resize", this.checkResize);
     },
     initBricks() {
+      for (let row = 0; row < this.brickRowCount; row++) {
+        this.bricks[row] = [];
+        for (let col = 0; col < this.brickColumnCount; col++) {
+          this.bricks[row][col] = {
+            x: 0,
+            y: 0,
+            width: this.generateRandomBrickWidth(),
+            status: 1,
+            color: this.getRandomColor()
+          };
+        }
+      }
+
+      /*
       for (var c = 0; c < this.brickColumnCount; c++) {
         this.bricks[c] = [];
         for (var r = 0; r < this.brickRowCount; r++) {
@@ -177,9 +197,10 @@ export default {
           };
         }
       }
+      */
     },
     draw() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); //Her konum değiştirildiğinden cancas yenile
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvas.height); //Her konum değiştirildiğinden cancas yenile
       this.drawBricks();
       this.drawBall();
       this.drawPaddle();
@@ -216,7 +237,7 @@ export default {
             this.drawMessage(
               "#d32f2f",
               "Kalan Hakkınız:" + this.lives,
-              this.canvas.width / 2 - 60
+              this.canvasWidth / 2 - 60
             );
 
             setTimeout(() => {
@@ -236,7 +257,7 @@ export default {
             this.drawMessage(
               "#d32f2f",
               "Tüm haklarınız tükendi.Oyunu kaybettiniz.",
-              this.canvas.width / 2 - 120
+              this.canvasWidth / 2 - 120
             );
           }
         }
@@ -245,14 +266,14 @@ export default {
       //En sağ veya sola gittiğinde
       if (
         this.ballX + this.ballSpeedX < this.ballRadius ||
-        this.ballX + this.ballSpeedX > this.canvas.width - this.ballRadius
+        this.ballX + this.ballSpeedX > this.canvasWidth - this.ballRadius
       ) {
         this.ballSpeedX = -this.ballSpeedX;
       }
 
       if (
         this.rightPresses &&
-        this.paddleX < this.canvas.width - this.paddleWidth
+        this.paddleX < this.canvasWidth - this.paddleWidth
       ) {
         this.paddleX += 7;
       } else if (this.leftPresses && this.paddleX > 0) {
@@ -266,36 +287,38 @@ export default {
       }
     },
     drawBricks() {
-      for (
-        var columnIndex = 0;
-        columnIndex < this.brickColumnCount;
-        columnIndex++
-      ) {
-        for (var rowIndex = 0; rowIndex < this.brickRowCount; rowIndex++) {
-          if (this.bricks[columnIndex][rowIndex].status === 1) {
-            var brickX =
-              columnIndex * (this.brickWidth + this.brickPadding) +
-              this.brickOffsetLeft;
-            var brickY =
-              rowIndex * (this.brickHeight + this.brickPadding) +
-              this.brickOffsetTop;
-            this.bricks[columnIndex][rowIndex].x = brickX;
-            this.bricks[columnIndex][rowIndex].y = brickY;
+      for (let row = 0; row < this.brickRowCount; row++) {
+        for (let col = 0; col < this.brickColumnCount; col++) {
+          if (this.bricks[row][col].status === 1) {
+            let brickX=null
+            if(col>0){
+               brickX =this.getTotalWidth(row, col) + col * this.brickOffsetLeft+(this.brickOffsetLeft*2);
+            }else{
+               brickX =this.brickOffsetLeft*2;
+            }
+            let brickY =  row * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
+            this.bricks[row][col].x = brickX;
+            this.bricks[row][col].y = brickY;
             this.ctx.beginPath();
             this.ctx.rect(
               brickX,
               brickY,
-              this.bricks[columnIndex][rowIndex].width,
+              this.bricks[row][col].width,
               this.brickHeight
             );
-
-            this.ctx.fillStyle = this.bricks[columnIndex][rowIndex].color;
-            //this.ctx.fillStyle = "#fdbb2d";
+            this.ctx.fillStyle = this.bricks[row][col].color;
             this.ctx.fill();
             this.ctx.closePath();
           }
         }
       }
+    },
+    getTotalWidth(rowNumber, colNumber) {
+      let totalBrickWidth = 0;
+      for (let col = 0; col < colNumber; col++) {
+        totalBrickWidth += this.bricks[rowNumber][col].width;
+      }
+      return totalBrickWidth;
     },
     getRandomColor() {
       let randomNumber = Math.floor(
@@ -326,9 +349,20 @@ export default {
 
       if (
         relativeX > this.paddleWidth / 2 &&
-        relativeX < this.canvas.width - this.paddleWidth / 2
+        relativeX < this.canvasWidth - this.paddleWidth / 2
       ) {
         this.paddleX = relativeX - this.paddleWidth / 2;
+      }
+    },
+    checkResize() {
+      let innerWidth = window.innerWidth;
+      console.log(innerWidth);
+      if (innerWidth >= 1000) {
+        this.canvasWidth = 1000;
+      } else {
+        this.canvasWidth = innerWidth;
+        this.minBrickWidth = 15;
+        this.maxBrickWidth = 30;
       }
     },
     drawBall() {
@@ -355,13 +389,9 @@ export default {
     },
 
     collisionDetection() {
-      for (
-        let columnIndex = 0;
-        columnIndex < this.brickColumnCount;
-        columnIndex++
-      ) {
-        for (let rowIndex = 0; rowIndex < this.brickRowCount; rowIndex++) {
-          var brick = this.bricks[columnIndex][rowIndex];
+      for (let row = 0; row < this.brickRowCount; row++) {
+        for (let col = 0; col < this.brickColumnCount; col++) {
+          let brick = this.bricks[row][col];
           if (brick.status === 1) {
             if (
               this.ballX > brick.x &&
@@ -383,7 +413,7 @@ export default {
                   this.drawMessage(
                     "#d32f2f",
                     "Oyunu kazandınız.Tebrikler,Tüm seviyeleri başarıyla tamamladınız.",
-                    this.canvas.width / 2 - 230
+                    this.canvasWidth / 2 - 230
                   );
                 } else {
                   this.level++;
@@ -401,7 +431,7 @@ export default {
                     "Level " +
                       (this.level - 1) +
                       " Tamamlandı.Sonraki Level'e geçiş yapılıyor...",
-                    this.canvas.width / 2 - 200
+                    this.canvasWidth / 2 - 200
                   );
                   setTimeout(() => {
                     this.paused = false;
@@ -430,12 +460,12 @@ export default {
     drawLives() {
       this.ctx.font = "16px Arial";
       this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Hak:" + this.lives, this.canvas.width - 65, 20);
+      this.ctx.fillText("Hak:" + this.lives, this.canvasWidth - 65, 20);
     },
     drawLevel() {
       this.ctx.font = "16px Arial";
       this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Seviye:" + this.level, this.canvas.width / 2 - 30, 20);
+      this.ctx.fillText("Seviye:" + this.level, this.canvasWidth / 2 - 30, 20);
     }
   }
 };
@@ -490,7 +520,7 @@ body {
   line-height: 1.5;
   border-radius: 0.25rem;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-  border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .btn3d {
   position: relative;
