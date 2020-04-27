@@ -38,7 +38,7 @@ export default {
       score: 0,
       lives: 3,
       level: 1,
-      maxLevel:5,
+      maxLevel: 5,
       paused: true,
       bricks: [],
       ball: null,
@@ -171,7 +171,7 @@ export default {
           this.bricks[c][r] = {
             x: 0,
             y: 0,
-            width:this.generateRandomBrickWidth(),
+            width: this.generateRandomBrickWidth(),
             status: 1,
             color: this.getRandomColor()
           };
@@ -213,7 +213,11 @@ export default {
             this.setBallLocation();
             this.setPaddleLocation();
 
-            this.drawMessage("#d32f2f", "Kalan Hakkınız:" + this.lives);
+            this.drawMessage(
+              "#d32f2f",
+              "Kalan Hakkınız:" + this.lives,
+              this.canvas.width / 2 - 60
+            );
 
             setTimeout(() => {
               this.draw();
@@ -229,7 +233,11 @@ export default {
               this.paused = true;
             }, 100);
             this.isGameOver = true;
-            this.drawMessage("#d32f2f", "Oyunu Kaybettiniz");
+            this.drawMessage(
+              "#d32f2f",
+              "Tüm haklarınız tükendi.Oyunu kaybettiniz.",
+              this.canvas.width / 2 - 120
+            );
           }
         }
       }
@@ -274,7 +282,12 @@ export default {
             this.bricks[columnIndex][rowIndex].x = brickX;
             this.bricks[columnIndex][rowIndex].y = brickY;
             this.ctx.beginPath();
-            this.ctx.rect(brickX, brickY,this.bricks[columnIndex][rowIndex].width, this.brickHeight);
+            this.ctx.rect(
+              brickX,
+              brickY,
+              this.bricks[columnIndex][rowIndex].width,
+              this.brickHeight
+            );
 
             this.ctx.fillStyle = this.bricks[columnIndex][rowIndex].color;
             //this.ctx.fillStyle = "#fdbb2d";
@@ -362,10 +375,16 @@ export default {
 
               this.playBrickSound();
 
-              if (this.score ===this.brickRowCount*this.brickColumnCount) {
-                if (this.level === this.maxLevel) {
-                  alert("You Win,congratilations");
-                  document.location.reload();
+              if (this.score === 1) {
+                if (this.level === 1) {
+                  this.$refs["startBtn"].innerText = "Yeniden Oyna";
+                  this.isGameOver = true;
+                  this.paused = true;
+                  this.drawMessage(
+                    "#d32f2f",
+                    "Oyunu kazandınız.Tebrikler,Tüm seviyeleri başarıyla tamamladınız.",
+                    this.canvas.width / 2 - 230
+                  );
                 } else {
                   this.level++;
                   this.brickRowCount++;
@@ -381,7 +400,8 @@ export default {
                     "#d32f2f",
                     "Level " +
                       (this.level - 1) +
-                      " Tamamlandı.Sonraki Level'e geçiş yapılıyor..."
+                      " Tamamlandı.Sonraki Level'e geçiş yapılıyor...",
+                    this.canvas.width / 2 - 200
                   );
                   setTimeout(() => {
                     this.paused = false;
@@ -394,15 +414,12 @@ export default {
         }
       }
     },
-    drawMessage(color, message) {
+
+    drawMessage(color, message, LocationX) {
       this.ctx.beginPath();
       this.ctx.font = "18px Arial";
       this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText(
-        message,
-        this.canvas.width / 2 -150,
-        this.canvas.height / 2 - 10
-      );
+      this.ctx.fillText(message, LocationX, this.canvas.height - 50);
     },
     drawScore() {
       this.ctx.font = "16px Arial";
