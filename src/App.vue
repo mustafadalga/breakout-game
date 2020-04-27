@@ -31,14 +31,14 @@ export default {
       brickRowCount: 3,
       brickColumnCount: 16,
       brickWidth: 50,
-      brickHeight: 20,
+      brickHeight: 25,
       brickPadding: 10,
       brickOffsetTop: 30,
       brickOffsetLeft: 30,
       score: 0,
       lives: 3,
       level: 1,
-      maxLevel: 5,
+      maxLevel:5,
       paused: true,
       bricks: [],
       ball: null,
@@ -74,12 +74,12 @@ export default {
           color2: "#0f9b0f"
         },
         {
-          color1:"#ff8235",
-          color2:"#30e8bf",
+          color1: "#ff8235",
+          color2: "#30e8bf"
         },
-          {
-          color1:"#f7971e",
-          color2:"#ffd200",
+        {
+          color1: "#f7971e",
+          color2: "#ffd200"
         }
       ]
     };
@@ -138,12 +138,16 @@ export default {
       this.ball = new Image();
       this.ball.src = ballImage;
     },
-    generateRandomNumber() {
+    generateRandomBallXNumber() {
       return Math.floor(Math.random() * 21) - 10;
     },
+    generateRandomBrickWidth() {
+      let min = 30,
+        max = 60;
+      return Math.floor(Math.random() * (max - min + 1) + min);
+    },
     setBallLocation() {
-      this.generateRandomNumber();
-      this.ballX = this.canvas.width / 2 + this.generateRandomNumber();
+      this.ballX = this.canvas.width / 2 + this.generateRandomBallXNumber();
       this.ballY = this.canvas.height - 30;
     },
     setPaddleLocation() {
@@ -164,7 +168,13 @@ export default {
       for (var c = 0; c < this.brickColumnCount; c++) {
         this.bricks[c] = [];
         for (var r = 0; r < this.brickRowCount; r++) {
-          this.bricks[c][r] = { x: 0, y: 0, status: 1,color:this.getRandomColor() };
+          this.bricks[c][r] = {
+            x: 0,
+            y: 0,
+            width:this.generateRandomBrickWidth(),
+            status: 1,
+            color: this.getRandomColor()
+          };
         }
       }
     },
@@ -194,7 +204,7 @@ export default {
         ) {
           this.ballSpeedY = -this.ballSpeedY;
         } else {
-          if(this.lives>0){
+          if (this.lives > 0) {
             this.lives--;
           }
           if (this.lives > 0) {
@@ -264,9 +274,9 @@ export default {
             this.bricks[columnIndex][rowIndex].x = brickX;
             this.bricks[columnIndex][rowIndex].y = brickY;
             this.ctx.beginPath();
-            this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
+            this.ctx.rect(brickX, brickY,this.bricks[columnIndex][rowIndex].width, this.brickHeight);
 
-             this.ctx.fillStyle = this.bricks[columnIndex][rowIndex].color
+            this.ctx.fillStyle = this.bricks[columnIndex][rowIndex].color;
             //this.ctx.fillStyle = "#fdbb2d";
             this.ctx.fill();
             this.ctx.closePath();
@@ -342,7 +352,7 @@ export default {
           if (brick.status === 1) {
             if (
               this.ballX > brick.x &&
-              this.ballX < brick.x + this.brickWidth &&
+              this.ballX < brick.x + brick.width &&
               this.ballY > brick.y &&
               this.ballY < brick.y + this.brickHeight
             ) {
@@ -352,7 +362,7 @@ export default {
 
               this.playBrickSound();
 
-              if (this.score === this.brickRowCount * this.brickColumnCount) {
+              if (this.score ===this.brickRowCount*this.brickColumnCount) {
                 if (this.level === this.maxLevel) {
                   alert("You Win,congratilations");
                   document.location.reload();
@@ -386,12 +396,12 @@ export default {
     },
     drawMessage(color, message) {
       this.ctx.beginPath();
-      this.ctx.font = "24px Arial";
+      this.ctx.font = "18px Arial";
       this.ctx.fillStyle = "#FFFFFF";
       this.ctx.fillText(
         message,
-        this.canvas.width / 2 - 75,
-        this.canvas.height / 2 - 15
+        this.canvas.width / 2 -150,
+        this.canvas.height / 2 - 10
       );
     },
     drawScore() {
