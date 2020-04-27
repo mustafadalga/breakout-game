@@ -2,14 +2,14 @@
   <div id="app">
     <canvas id="gameCanvas" width="1000" height="400"></canvas>
     <div id="options">
-      <button @click="start()" ref="startBtn">Başlat</button>
+      <button type="button" class="btn btn-info btn-lg btn3d"  @click="start()" ref="startBtn">Başlat</button>
     </div>
   </div>
 </template>
 
 <script>
 import ballImage from "./assets/img/football-ball.png";
-import BrickSoundEffeck from "./assets/sound/2.mp3";
+import BrickSoundEffect from "./assets/sound/brick-effect.mp3";
 
 export default {
   name: "Home",
@@ -22,7 +22,7 @@ export default {
       ballSpeedX: 5,
       ballSpeedY: -5,
       ballRadius: 15,
-      paddleHeight: 10,
+      paddleHeight: 15,
       paddleWidth: 120,
       paddleX: null,
       paddleY: null,
@@ -125,7 +125,7 @@ export default {
       this.draw();
     },
     setSoundFile() {
-      this.brickSound = new Audio(BrickSoundEffeck);
+      this.brickSound = new Audio(BrickSoundEffect);
     },
     playBrickSound() {
       if (this.brickSound.paused) {
@@ -375,8 +375,8 @@ export default {
 
               this.playBrickSound();
 
-              if (this.score === 1) {
-                if (this.level === 1) {
+              if (this.score === this.brickRowCount * this.brickColumnCount) {
+                if (this.level === this.maxLevel) {
                   this.$refs["startBtn"].innerText = "Yeniden Oyna";
                   this.isGameOver = true;
                   this.paused = true;
@@ -440,7 +440,7 @@ export default {
   }
 };
 </script>
-<style >
+<style>
 body {
   background: #004d40;
 }
@@ -471,16 +471,57 @@ body {
   display: flex;
   justify-content: center;
 }
-#options button {
-  width: 8em;
-  height: 3em;
-  background: rgb(66, 184, 221);
-  border: none;
-  border-radius: 1em;
-  outline: none;
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  color: #ffffff;
+  text-align: center;
+  vertical-align: middle;
   cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.375rem 2rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+  border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
-#options button:not(:first-child) {
-  margin-left: 1em;
+.btn3d {
+  position: relative;
+  top: -6px;
+  border: 0;
+  transition: all 40ms linear;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.btn3d:active:focus,
+.btn3d:focus:hover,
+.btn3d:focus {
+  -moz-outline-style: none;
+  outline: medium none;
+}
+
+.btn3d:active,
+.btn3d.active {
+  top: 2px;
+}
+.btn3d.btn-info {
+  box-shadow: 0 0 0 1px #00a5c3 inset, 0 0 0 2px rgba(255, 255, 255, 0.15) inset,
+    0 8px 0 0 #348fd2, 0 8px 8px 1px rgba(0, 0, 0, 0.5);
+  background-color: #39b3d7;
+}
+.btn3d.btn-info:active,
+.btn3d.btn-info.active {
+  box-shadow: 0 0 0 1px #00a5c3 inset, 0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+    0 1px 3px 1px rgba(0, 0, 0, 0.3);
+  background-color: #39b3d7;
 }
 </style>
