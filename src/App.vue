@@ -16,8 +16,9 @@ export default {
   data() {
     return {
       canvas: null,
-      canvasWidth: 1000,
+      canvasWidth: 1200,
       canvasHeight: 400,
+      canvasPaddingLeft: 40,
       ctx: null,
       ballX: null,
       ballY: null,
@@ -31,10 +32,10 @@ export default {
       rightPresses: false,
       leftPresses: false,
       brickRowCount: 3,
-      brickColumnCount: 16,
-      brickHeight: 25,
-      minBrickWidth: 30,
-      maxBrickWidth: 60,
+      brickColumnCount: 20,
+      brickHeight: 30,
+      brickMaxWidth: 60,
+      brickMinWidth: 30,
       brickPadding: 10,
       brickOffsetTop: 30,
       brickOffsetLeft: 10,
@@ -87,8 +88,10 @@ export default {
       ]
     };
   },
-  mounted() {
+  created() {
 
+  },
+  mounted() {
     this.setSoundFile();
     this.setBallImage();
     this.getCanvasObject();
@@ -147,60 +150,63 @@ export default {
     },
     generateRandomBrickWidth() {
       return Math.floor(
-        Math.random() * (this.maxBrickWidth - this.minBrickWidth + 1) +
-          this.minBrickWidth
+        Math.random() * (this.brickMinWidth - this.brickMaxWidth + 1) +
+          this.brickMaxWidth
       );
     },
     setBallLocation() {
       this.ballX = this.canvasWidth / 2 + this.generateRandomBallXNumber();
-      this.ballY = this.canvas.height - 30;
+      this.ballY = this.canvasHeight - 30;
     },
     setPaddleLocation() {
       this.paddleX = (this.canvasWidth - this.paddleWidth) / 2;
-      this.paddleY = this.canvas.height - this.paddleHeight;
+      this.paddleY = this.canvasHeight - this.paddleHeight;
     },
     getCanvasObject() {
       this.canvas = document.getElementById("gameCanvas");
       this.ctx = this.canvas.getContext("2d");
     },
- 
+
     addEventListener() {
       document.addEventListener("keydown", this.keyDownHandler);
       document.addEventListener("keyup", this.keyUpHandler);
       document.addEventListener("mousemove", this.mouseMoveHandler);
-      window.addEventListener("resize", this.checkResize);
+      
+    },
+    checkTotalBrickWidth(row, col) {
+      let brickRandomWidth = this.generateRandomBrickWidth();
+      let total = this.getTotalWidth(row, col);
+      if (total === col * this.brickMaxWidth) {
+        this.checkTotalBrickWidth(row, col);
+      }
+      {
+        return brickRandomWidth;
+      }
     },
     initBricks() {
       for (let row = 0; row < this.brickRowCount; row++) {
         this.bricks[row] = [];
         for (let col = 0; col < this.brickColumnCount; col++) {
+          let brickRandomWidth = null;
+
+          if (col >= (this.brickColumnCount * 2) / 3) {
+            brickRandomWidth = this.checkTotalBrickWidth(row, col);
+          } else {
+            brickRandomWidth = this.generateRandomBrickWidth();
+          }
           this.bricks[row][col] = {
             x: 0,
             y: 0,
-            width: this.generateRandomBrickWidth(),
+            width: brickRandomWidth,
             status: 1,
             color: this.getRandomColor()
           };
         }
       }
-
-      /*
-      for (var c = 0; c < this.brickColumnCount; c++) {
-        this.bricks[c] = [];
-        for (var r = 0; r < this.brickRowCount; r++) {
-          this.bricks[c][r] = {
-            x: 0,
-            y: 0,
-            width: this.generateRandomBrickWidth(),
-            status: 1,
-            color: this.getRandomColor()
-          };
-        }
-      }
-      */
     },
     draw() {
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvas.height); //Her konum değiştirildiğinden cancas yenile
+      console.log(this.canvasWidth, this.canvasHeight);
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight); //Her konum değiştirildiğinden cancas yenile
       this.drawBricks();
       this.drawBall();
       this.drawPaddle();
@@ -215,7 +221,7 @@ export default {
         this.ballSpeedY = -this.ballSpeedY;
       } else if (
         this.ballY + this.ballSpeedY >
-        this.canvas.height - this.ballRadius
+        this.canvasHeight - this.ballRadius
       ) {
         //Rakete dokunduğunda
 
@@ -290,13 +296,18 @@ export default {
       for (let row = 0; row < this.brickRowCount; row++) {
         for (let col = 0; col < this.brickColumnCount; col++) {
           if (this.bricks[row][col].status === 1) {
-            let brickX=null
-            if(col>0){
-               brickX =this.getTotalWidth(row, col) + col * this.brickOffsetLeft+(this.brickOffsetLeft*2);
-            }else{
-               brickX =this.brickOffsetLeft*2;
+            let brickX = null;
+            if (col > 0) {
+              brickX =
+                this.getTotalWidth(row, col) +
+                col * this.brickOffsetLeft +
+                this.canvasPaddingLeft;
+            } else {
+              brickX = this.canvasPaddingLeft;
             }
-            let brickY =  row * (this.brickHeight + this.brickPadding) + this.brickOffsetTop;
+            let brickY =
+              row * (this.brickHeight + this.brickPadding) +
+              this.brickOffsetTop;
             this.bricks[row][col].x = brickX;
             this.bricks[row][col].y = brickY;
             this.ctx.beginPath();
@@ -354,17 +365,7 @@ export default {
         this.paddleX = relativeX - this.paddleWidth / 2;
       }
     },
-    checkResize() {
-      let innerWidth = window.innerWidth;
-      console.log(innerWidth);
-      if (innerWidth >= 1000) {
-        this.canvasWidth = 1000;
-      } else {
-        this.canvasWidth = innerWidth;
-        this.minBrickWidth = 15;
-        this.maxBrickWidth = 30;
-      }
-    },
+
     drawBall() {
       this.ctx.drawImage(
         this.ball,
@@ -449,7 +450,7 @@ export default {
       this.ctx.beginPath();
       this.ctx.font = "18px Arial";
       this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText(message, LocationX, this.canvas.height - 50);
+      this.ctx.fillText(message, LocationX, this.canvasHeight - 50);
     },
     drawScore() {
       this.ctx.font = "16px Arial";
