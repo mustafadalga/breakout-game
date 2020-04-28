@@ -2,7 +2,7 @@
   <div id="app">
     <canvas id="gameCanvas" :width="canvasWidth" :height="canvasHeight"></canvas>
     <div id="options">
-      <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat</button>
+      <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat {{ brickColumnCount }}</button>
     </div>
     <div class="modal-overlay">
       <div class="modal">
@@ -39,7 +39,7 @@ export default {
       brickColumnCount: 20,
       brickHeight: 30,
       brickMaxWidth: 60,
-      brickMinWidth: 55,
+      brickMinWidth: 30,
       brickPadding: 10,
       brickOffsetTop: 30,
       brickOffsetLeft: 10,
@@ -428,7 +428,7 @@ export default {
     },
     touchMoveHandler(e) {
       var x = e.touches[0].clientX;
-      this.paddleX = x;
+      this.paddleX = x-this.paddleWidth / 2;
     },
     drawBall() {
       this.ctx.drawImage(
