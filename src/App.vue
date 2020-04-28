@@ -547,6 +547,7 @@ body {
   display: block;
   margin: 0 auto;
   cursor: pointer;
+  border-bottom:10px solid #ffffff;
 }
 #options {
   margin-top: 1em;
