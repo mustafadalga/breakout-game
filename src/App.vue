@@ -2,7 +2,12 @@
   <div id="app">
     <canvas id="gameCanvas" :width="canvasWidth" :height="canvasHeight"></canvas>
     <div id="options">
-      <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat</button>
+      <button
+        type="button"
+        class="btn btn-info btn-lg btn3d"
+        @click="start()"
+        ref="startBtn"
+      >Başlat</button>
     </div>
   </div>
 </template>
@@ -35,7 +40,7 @@ export default {
       brickColumnCount: 20,
       brickHeight: 30,
       brickMaxWidth: 60,
-      brickMinWidth: 30,
+      brickMinWidth: 55,
       brickPadding: 10,
       brickOffsetTop: 30,
       brickOffsetLeft: 10,
@@ -89,7 +94,7 @@ export default {
     };
   },
   created() {
-
+    this.checkWindowResize();
   },
   mounted() {
     this.setSoundFile();
@@ -101,8 +106,66 @@ export default {
     this.initBricks();
     this.draw();
   },
-
   methods: {
+    checkWindowResize() {
+      let innerWidth = window.innerWidth;
+      if (innerWidth >= 1100 && innerWidth < 1200) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 17;
+        this.brickOffsetLeft = 9;
+        this.canvasPaddingLeft = 30;
+      } else if (innerWidth >= 1000 && innerWidth < 1100) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 16;
+        this.brickOffsetLeft = 8;
+        this.canvasPaddingLeft = 25;
+      } else if (innerWidth >= 900 && innerWidth < 1000) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 15;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 20;
+      } else if (innerWidth >= 800 && innerWidth < 900) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 13;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 10;
+      } else if (innerWidth >= 700 && innerWidth < 800) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 12;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 5;
+      } else if (innerWidth >= 600 && innerWidth < 700) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 10;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 5;
+      } else if (innerWidth >= 500 && innerWidth < 600) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 8;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 1;
+      } else if (innerWidth >= 400 && innerWidth < 500) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 7;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 10;
+      } else if (innerWidth >= 300 && innerWidth < 400) {
+        this.canvasWidth = window.innerWidth;
+        this.brickColumnCount = 6;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 10;
+      } else if (innerWidth < 300) {
+        this.brickColumnCount = 5;
+        this.brickOffsetLeft = 5;
+        this.canvasPaddingLeft = 10;
+      }
+      if (this.ctx !== null) {
+        this.setPaddleLocation();
+        this.setBallLocation();
+        this.initBricks();
+        this.draw();
+      }
+    },
     start() {
       if (!this.isGameOver) {
         if (this.paused) {
@@ -166,12 +229,11 @@ export default {
       this.canvas = document.getElementById("gameCanvas");
       this.ctx = this.canvas.getContext("2d");
     },
-
     addEventListener() {
       document.addEventListener("keydown", this.keyDownHandler);
       document.addEventListener("keyup", this.keyUpHandler);
       document.addEventListener("mousemove", this.mouseMoveHandler);
-      
+      window.addEventListener("resize", this.checkWindowResize);
     },
     checkTotalBrickWidth(row, col) {
       let brickRandomWidth = this.generateRandomBrickWidth();
@@ -205,7 +267,6 @@ export default {
       }
     },
     draw() {
-      console.log(this.canvasWidth, this.canvasHeight);
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight); //Her konum değiştirildiğinden cancas yenile
       this.drawBricks();
       this.drawBall();
