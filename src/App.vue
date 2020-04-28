@@ -428,7 +428,7 @@ export default {
     },
     touchMoveHandler(e) {
       var x = e.touches[0].clientX;
-      this.paddleX = x-this.paddleWidth / 2;
+      this.paddleX = x+this.paddleWidth / 2;
     },
     drawBall() {
       this.ctx.drawImage(
