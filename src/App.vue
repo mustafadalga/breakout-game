@@ -164,15 +164,15 @@ export default {
     start() {
       if (!this.isGameOver) {
         if (this.paused) {
-          this.$refs["startBtn"].innerText = "Duraklat";
+          this.changeButtonText("Duraklat");
           this.paused = false;
           this.draw();
         } else {
-          this.$refs["startBtn"].innerText = "Başlat";
+          this.changeButtonText("Başlat");
           this.paused = true;
         }
       } else {
-        this.$refs["startBtn"].innerText = "Duraklat";
+        this.changeButtonText("Duraklat");
         this.isGameOver = false;
         this.paused = false;
         this.resetGameData();
@@ -311,7 +311,7 @@ export default {
               this.draw();
             }, 2000);
           } else {
-            this.$refs["startBtn"].innerText = "Yeniden Oyna";
+            this.changeButtonText("Yeniden Oyna");
             setTimeout(() => {
               this.paused = true;
             }, 100);
@@ -464,7 +464,7 @@ export default {
 
               if (this.score === this.brickRowCount * this.brickColumnCount) {
                 if (this.level === this.maxLevel) {
-                  this.$refs["startBtn"].innerText = "Yeniden Oyna";
+                  this.changeButtonText("Yeniden Oyna");
                   this.isGameOver = true;
                   this.paused = true;
                   this.drawMessage(
@@ -498,6 +498,9 @@ export default {
           }
         }
       }
+    },
+    changeButtonText(text) {
+      this.$refs["startBtn"].innerText = text;
     },
     increaseLevel() {
       this.level++;
