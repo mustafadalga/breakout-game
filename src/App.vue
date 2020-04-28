@@ -4,13 +4,17 @@
     <div id="options">
       <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat</button>
     </div>
+    <div class="modal-overlay">
+      <div class="modal">
+        <h2>Lütfen cihazını çevirin !</h2>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import ballImage from "./assets/img/football-ball.png";
 import BrickSoundEffect from "./assets/sound/brick-effect.mp3";
-
 export default {
   name: "Home",
   data() {
@@ -546,19 +550,10 @@ body {
   margin: 0;
   padding: 0;
 }
-
 #gameCanvas {
-  background: #c94b4b; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to left,
-    #4b134f,
-    #c94b4b
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-    to left,
-    #4b134f,
-    #c94b4b
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: #c94b4b;
+  background: -webkit-linear-gradient(to left, #4b134f, #c94b4b);
+  background: linear-gradient(to left, #4b134f, #c94b4b);
 
   display: block;
   margin: 0 auto;
@@ -569,7 +564,6 @@ body {
   display: flex;
   justify-content: center;
 }
-
 .btn {
   display: inline-block;
   font-weight: 400;
@@ -621,5 +615,39 @@ body {
   box-shadow: 0 0 0 1px #00a5c3 inset, 0 0 0 1px rgba(255, 255, 255, 0.15) inset,
     0 1px 3px 1px rgba(0, 0, 0, 0.3);
   background-color: #39b3d7;
+}
+.modal-overlay {
+  display: none;
+  position: fixed;
+ width: 100%; 
+  height: 100%; 
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.modal {
+  width: 50%;
+  height: 25%;
+  background: #c94b4b;
+  background: -webkit-linear-gradient(to left, #4b134f, #c94b4b);
+  background: linear-gradient(to left, #4b134f, #c94b4b);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal h2 {
+  color: #ffffff;
+}
+@media screen and (orientation: landscape) and (max-device-width: 900px) {
+  .modal-overlay {
+    display: block;
+  }
 }
 </style>
