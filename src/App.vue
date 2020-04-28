@@ -2,12 +2,7 @@
   <div id="app">
     <canvas id="gameCanvas" :width="canvasWidth" :height="canvasHeight"></canvas>
     <div id="options">
-      <button
-        type="button"
-        class="btn btn-info btn-lg btn3d"
-        @click="start()"
-        ref="startBtn"
-      >Başlat</button>
+      <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat</button>
     </div>
   </div>
 </template>
@@ -482,9 +477,7 @@ export default {
                   this.brickRowCount++;
                   this.initBricks();
                   this.score = 0;
-                  this.ballSpeedX += 1;
-                  this.ballSpeedY = -this.ballSpeedY;
-                  this.ballSpeedY -= 1;
+                  this.increaseBallSpeed();
                   this.setBallLocation();
                   this.setPaddleLocation();
                   this.paused = true;
@@ -506,7 +499,11 @@ export default {
         }
       }
     },
-
+    increaseBallSpeed() {
+      this.ballSpeedX += 1;
+      this.ballSpeedY = -this.ballSpeedY;
+      this.ballSpeedY -= 1;
+    },
     drawMessage(color, message, LocationX) {
       this.ctx.beginPath();
       this.ctx.font = "18px Arial";
