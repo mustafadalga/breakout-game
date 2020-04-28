@@ -434,7 +434,7 @@ export default {
         this.paddleWidth,
         this.paddleHeight
       );
-      this.ctx.fillStyle = "#0095DD";
+      this.ctx.fillStyle = "#00a5c3";
       this.ctx.fill();
       this.ctx.closePath();
     },
