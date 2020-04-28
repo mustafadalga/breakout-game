@@ -2,7 +2,12 @@
   <div id="app">
     <canvas id="gameCanvas" :width="canvasWidth" :height="canvasHeight"></canvas>
     <div id="options">
-      <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat {{ brickColumnCount }}</button>
+      <button
+        type="button"
+        class="btn btn-info btn-lg btn3d"
+        @click="start()"
+        ref="startBtn"
+      >Başlat {{ brickColumnCount }}</button>
     </div>
     <div class="modal-overlay">
       <div class="modal">
@@ -23,6 +28,7 @@ export default {
       canvasWidth: 1200,
       canvasHeight: 400,
       canvasPaddingLeft: 40,
+      messageFontSize: "18px",
       ctx: null,
       ballX: null,
       ballY: null,
@@ -109,54 +115,29 @@ export default {
     checkWindowResize() {
       let innerWidth = window.innerWidth;
       if (innerWidth >= 1100 && innerWidth < 1200) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 17;
-        this.brickOffsetLeft = 9;
-        this.canvasPaddingLeft = 30;
+        this.updateWindowResizeData(innerWidth, 17, 9, 30);
       } else if (innerWidth >= 1000 && innerWidth < 1100) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 16;
-        this.brickOffsetLeft = 8;
-        this.canvasPaddingLeft = 25;
+        this.updateWindowResizeData(innerWidth, 16, 8, 25);
       } else if (innerWidth >= 900 && innerWidth < 1000) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 15;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 20;
+        this.updateWindowResizeData(innerWidth, 15, 5, 20);
       } else if (innerWidth >= 800 && innerWidth < 900) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 13;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 10;
+        this.updateWindowResizeData(innerWidth, 13, 5, 10);
       } else if (innerWidth >= 700 && innerWidth < 800) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 12;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 5;
+        this.updateWindowResizeData(innerWidth, 12, 5, 5);
       } else if (innerWidth >= 600 && innerWidth < 700) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 10;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 5;
+        this.updateWindowResizeData(innerWidth, 10, 5, 5);
       } else if (innerWidth >= 500 && innerWidth < 600) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 8;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 1;
+        this.updateWindowResizeData(innerWidth, 8, 5, 1);
       } else if (innerWidth >= 400 && innerWidth < 500) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 7;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 10;
+        this.updateWindowResizeData(innerWidth, 7, 5, 10);
       } else if (innerWidth >= 300 && innerWidth < 400) {
-        this.canvasWidth = window.innerWidth;
-        this.brickColumnCount = 6;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 10;
+        this.updateWindowResizeData(innerWidth, 6, 5, 10);
+        this.messageFontSize = "14px";
       } else if (innerWidth < 300) {
-        this.brickColumnCount = 5;
-        this.brickOffsetLeft = 5;
-        this.canvasPaddingLeft = 10;
+        this.updateWindowResizeData(innerWidth, 5, 5, 10);
+        this.messageFontSize = "12px";
+      } else {
+        this.updateWindowResizeData(1200, 20, 10, 30);
       }
       if (this.ctx !== null) {
         this.setPaddleLocation();
@@ -164,6 +145,17 @@ export default {
         this.initBricks();
         this.draw();
       }
+    },
+    updateWindowResizeData(
+      canvasWidth,
+      brickColumnCount,
+      brickOffsetLeft,
+      canvasPaddingLeft
+    ) {
+      this.canvasWidth = canvasWidth;
+      this.brickColumnCount = brickColumnCount;
+      this.brickOffsetLeft = brickOffsetLeft;
+      this.canvasPaddingLeft = canvasPaddingLeft;
     },
     start() {
       if (!this.isGameOver) {
@@ -276,16 +268,12 @@ export default {
       this.drawLevel();
       this.collisionDetection();
 
-      //En aşağıya veya yukarıya gittiğinde
-
       if (this.ballY + this.ballSpeedY < this.ballRadius) {
         this.ballSpeedY = -this.ballSpeedY;
       } else if (
         this.ballY + this.ballSpeedY >
         this.canvasHeight - this.ballRadius
       ) {
-        //Rakete dokunduğunda
-
         if (
           this.ballX > this.paddleX &&
           this.ballX < this.paddleX + this.paddleWidth
@@ -329,8 +317,6 @@ export default {
           }
         }
       }
-
-      //En sağ veya sola gittiğinde
       if (
         this.ballX + this.ballSpeedX < this.ballRadius ||
         this.ballX + this.ballSpeedX > this.canvasWidth - this.ballRadius
@@ -428,7 +414,7 @@ export default {
     },
     touchMoveHandler(e) {
       var x = e.touches[0].clientX;
-      this.paddleX = x+this.paddleWidth / 2;
+      this.paddleX = x;
     },
     drawBall() {
       this.ctx.drawImage(
@@ -523,7 +509,7 @@ export default {
     },
     drawMessage(color, message, LocationX) {
       this.ctx.beginPath();
-      this.ctx.font = "18px Arial";
+      this.ctx.font = this.messageFontSize + " Arial";
       this.ctx.fillStyle = "#FFFFFF";
       this.ctx.fillText(message, LocationX, this.canvasHeight - 50);
     },
@@ -549,6 +535,7 @@ export default {
 <style>
 body {
   background: #004d40;
+  
 }
 * {
   margin: 0;
