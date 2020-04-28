@@ -534,18 +534,16 @@ export default {
 </script>
 <style>
 body {
-  background: #004d40;
-  
+    background: #c94b4b;
+  background: -webkit-linear-gradient(to left, #4b134f, #c94b4b);
+  background: linear-gradient(to left, #4b134f, #c94b4b);
 }
 * {
   margin: 0;
   padding: 0;
 }
 #gameCanvas {
-  background: #c94b4b;
-  background: -webkit-linear-gradient(to left, #4b134f, #c94b4b);
-  background: linear-gradient(to left, #4b134f, #c94b4b);
-
+  background: transparent;
   display: block;
   margin: 0 auto;
   cursor: pointer;
