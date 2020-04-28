@@ -232,6 +232,7 @@ export default {
       document.addEventListener("keydown", this.keyDownHandler);
       document.addEventListener("keyup", this.keyUpHandler);
       document.addEventListener("mousemove", this.mouseMoveHandler);
+      document.addEventListener("touchmove", this.touchMoveHandler);
       window.addEventListener("resize", this.checkWindowResize);
     },
     checkTotalBrickWidth(row, col) {
@@ -425,7 +426,10 @@ export default {
         this.paddleX = relativeX - this.paddleWidth / 2;
       }
     },
-
+    touchMoveHandler(e) {
+      var x = e.touches[0].clientX;
+      this.paddleX = x;
+    },
     drawBall() {
       this.ctx.drawImage(
         this.ball,
@@ -619,8 +623,8 @@ body {
 .modal-overlay {
   display: none;
   position: fixed;
- width: 100%; 
-  height: 100%; 
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.8);
   z-index: 1;
   top: 0;
