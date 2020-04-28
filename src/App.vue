@@ -473,8 +473,8 @@ export default {
                     this.canvasWidth / 2 - 230
                   );
                 } else {
-                  this.level++;
-                  this.brickRowCount++;
+                  this.increaseLevel();
+                  this.increaseBrickRow();
                   this.initBricks();
                   this.score = 0;
                   this.increaseBallSpeed();
@@ -498,6 +498,12 @@ export default {
           }
         }
       }
+    },
+    increaseLevel() {
+      this.level++;
+    },
+    increaseBrickRow() {
+      this.brickRowCount++;
     },
     increaseBallSpeed() {
       this.ballSpeedX += 1;
