@@ -161,16 +161,16 @@ export default {
       if (!this.isGameOver) {
         if (this.paused) {
           this.changeButtonText("Duraklat");
-          this.paused = false;
+          this.changePauseStatus(false)
           this.draw();
         } else {
           this.changeButtonText("Başlat");
-          this.paused = true;
+          this.changePauseStatus(true)
         }
       } else {
         this.changeButtonText("Duraklat");
         this.isGameOver = false;
-        this.paused = false;
+        this.changePauseStatus(false)
         this.resetGameData();
       }
     },
@@ -282,7 +282,7 @@ export default {
         } else {
           this.decreaseLives();
           if (this.lives > 0) {
-            this.paused = true;
+            this.changePauseStatus(true)
             this.ballSpeedY = -this.ballSpeedY;
             this.setBallLocation();
             this.setPaddleLocation();
@@ -294,16 +294,16 @@ export default {
             );
             setTimeout(() => {
               this.draw();
-              this.paused = true;
+              this.changePauseStatus(true)
             }, 1000);
             setTimeout(() => {
-              this.paused = false;
+              this.changePauseStatus(false)
               this.draw();
             }, 2000);
           } else {
             this.changeButtonText("Yeniden Oyna");
             setTimeout(() => {
-              this.paused = true;
+              this.changePauseStatus(true)
             }, 100);
             this.isGameOver = true;
             this.drawMessage(
@@ -462,7 +462,7 @@ export default {
                 if (this.level === this.maxLevel) {
                   this.changeButtonText("Yeniden Oyna");
                   this.isGameOver = true;
-                  this.paused = true;
+                  this.changePauseStatus(true)
                   this.drawMessage(
                     "#d32f2f",
                     "Oyunu kazandınız.Tebrikler,Tüm seviyeleri başarıyla tamamladınız.",
@@ -476,7 +476,7 @@ export default {
                   this.increaseBallSpeed();
                   this.setBallLocation();
                   this.setPaddleLocation();
-                  this.paused = true;
+                  this.changePauseStatus(true)
                   this.drawMessage(
                     "#d32f2f",
                     "Level " +
@@ -485,7 +485,7 @@ export default {
                     this.canvasWidth / 2 - 200
                   );
                   setTimeout(() => {
-                    this.paused = false;
+                    this.changePauseStatus(false)
                     this.draw();
                   }, 3000);
                 }
@@ -502,6 +502,9 @@ export default {
       if (this.lives > 0) {
         this.lives--;
       }
+    },
+    changePauseStatus(status){
+       this.paused=status
     },
     increaseLevel() {
       this.level++;
