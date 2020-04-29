@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <canvas id="gameCanvas" :width="canvasWidth" :height="canvasHeight"></canvas>
+
     <div id="options">
       <button
         type="button"
@@ -9,6 +10,7 @@
         ref="startBtn"
       >Başlat {{ width }}</button>
     </div>
+       
     <div class="modal-overlay">
       <div class="modal">
         <h2>Lütfen cihazını çevirin !</h2>
@@ -27,7 +29,7 @@ export default {
       canvas: null,
       canvasWidth: 1200,
       canvasHeight: 400,
-      canvasPaddingLeft: 40,
+      canvasPaddingLeft: 15,
       messageFontSize: "18px",
       ctx: null,
       ballX: null,
@@ -47,7 +49,6 @@ export default {
       brickWidth: 60,
       brickPadding: 10,
       brickOffsetTop: 30,
-      brickOffsetLeft: 10,
       score: 0,
       lives: 3,
       level: 1,
@@ -115,30 +116,46 @@ export default {
     checkWindowResize() {
       let innerWidth = window.innerWidth;
       this.width = innerWidth;
-      if (innerWidth >= 1100 && innerWidth < 1200) {
-        this.updateWindowResizeData(innerWidth, 18, 9, 30);
-      } else if (innerWidth >= 1000 && innerWidth < 1100) {
-        this.updateWindowResizeData(innerWidth, 16, 8, 25);
-      } else if (innerWidth >= 900 && innerWidth < 1000) {
-        this.updateWindowResizeData(innerWidth, 15, 5, 20);
-      } else if (innerWidth >= 800 && innerWidth < 900) {
-        this.updateWindowResizeData(innerWidth, 13, 5, 10);
-      } else if (innerWidth >= 700 && innerWidth < 800) {
-        this.updateWindowResizeData(innerWidth, 12, 5, 5);
-      } else if (innerWidth >= 600 && innerWidth < 700) {
-        this.updateWindowResizeData(innerWidth, 10, 5, 5);
-      } else if (innerWidth >= 500 && innerWidth < 600) {
-        this.updateWindowResizeData(innerWidth, 8, 5, 1);
-      } else if (innerWidth >= 400 && innerWidth < 500) {
-        this.updateWindowResizeData(innerWidth, 7, 5, 10);
-      } else if (innerWidth >= 300 && innerWidth < 400) {
-        this.updateWindowResizeData(innerWidth, 6, 5, 10);
-        this.messageFontSize = "14px";
+      if (innerWidth >= 1150 && innerWidth < 1200) {
+        this.updateWindowResizeData(innerWidth, 16, 10, 25, 18);
+      } else if (innerWidth >= 1100 && innerWidth < 1150) {
+        this.updateWindowResizeData(innerWidth, 16, 10, 0, 18);
+      } else if (innerWidth >= 1050 && innerWidth < 1100) {
+        this.updateWindowResizeData(innerWidth, 15, 10, 10, 18);
+      } else if (innerWidth >= 1000 && innerWidth < 1050) {
+        this.updateWindowResizeData(innerWidth, 15, 7, 0, 18);
+      } else if (innerWidth >= 950 && innerWidth < 1000) {
+        this.updateWindowResizeData(innerWidth, 14, 8, 0, 18);
+      } else if (innerWidth >= 900 && innerWidth < 950) {
+        this.updateWindowResizeData(innerWidth, 14, 5, 0, 18);
+      } else if (innerWidth >= 850 && innerWidth < 900) {
+        this.updateWindowResizeData(innerWidth, 13, 5, 10, 18);
+      } else if (innerWidth >= 800 && innerWidth < 850) {
+        this.updateWindowResizeData(innerWidth, 13, 3, 0, 18);
+      } else if (innerWidth >= 750 && innerWidth < 800) {
+        this.updateWindowResizeData(innerWidth, 12, 3, 0, 18);
+      } else if (innerWidth >= 700 && innerWidth < 750) {
+        this.updateWindowResizeData(innerWidth, 11, 3, 5, 18);
+      } else if (innerWidth >= 650 && innerWidth < 700) {
+        this.updateWindowResizeData(innerWidth, 10, 3, 10, 18);
+      } else if (innerWidth >= 600 && innerWidth < 650) {
+        this.updateWindowResizeData(innerWidth, 10, 3, 0, 14);
+      } else if (innerWidth >= 550 && innerWidth < 600) {
+        this.updateWindowResizeData(innerWidth, 9, 2, 0, 14);
+      } else if (innerWidth >= 500 && innerWidth < 550) {
+        this.updateWindowResizeData(innerWidth, 8, 2, 0, 12);
+      } else if (innerWidth >= 450 && innerWidth < 500) {
+        this.updateWindowResizeData(innerWidth, 8, 2, 0, 12);
+      } else if (innerWidth >= 400 && innerWidth < 450) {
+        this.updateWindowResizeData(innerWidth, 7, 2, 0, 12);
+      } else if (innerWidth >= 350 && innerWidth < 400) {
+        this.updateWindowResizeData(innerWidth, 6, 2, 0, 12);
+      } else if (innerWidth >= 300 && innerWidth < 350) {
+        this.updateWindowResizeData(innerWidth, 5, 2, 0, 12);
       } else if (innerWidth < 300) {
-        this.updateWindowResizeData(innerWidth, 5, 5, 10);
-        this.messageFontSize = "12px";
+        this.updateWindowResizeData(innerWidth, 4, 2, 0, 12);
       } else {
-        this.updateWindowResizeData(1200, 17, 10, 30);
+        this.updateWindowResizeData(1200, 17, 10, 5, 18);
       }
       if (this.ctx !== null) {
         this.setPaddleLocation();
@@ -150,13 +167,15 @@ export default {
     updateWindowResizeData(
       canvasWidth,
       brickColumnCount,
-      brickOffsetLeft,
-      canvasPaddingLeft
+      brickPadding,
+      canvasPaddingLeft,
+      fontSize
     ) {
       this.canvasWidth = canvasWidth;
       this.brickColumnCount = brickColumnCount;
-      this.brickOffsetLeft = brickOffsetLeft;
+      this.brickPadding = brickPadding;
       this.canvasPaddingLeft = canvasPaddingLeft;
+      this.messageFontSize = fontSize + "px";
     },
     start() {
       if (!this.isGameOver) {
@@ -320,7 +339,7 @@ export default {
           if (this.bricks[row][col].status === 1) {
             let brickX =
               col * (this.brickWidth + this.brickPadding) +
-              this.brickOffsetLeft;
+              this.canvasPaddingLeft;
             let brickY =
               row * (this.brickHeight + this.brickPadding) +
               this.brickOffsetTop;
@@ -418,7 +437,7 @@ export default {
 
               this.playBrickSound();
 
-              if (this.score === this.brickRowCount * this.brickColumnCount) {
+              if (this.score === 1) {
                 if (this.level === this.maxLevel) {
                   this.changeButtonText("Yeniden Oyna");
                   this.isGameOver = true;
