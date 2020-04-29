@@ -89,8 +89,7 @@ export default {
           color1: "#f7971e",
           color2: "#ffd200"
         }
-      ],
-      width: 0
+      ]
     };
   },
   created() {
@@ -107,112 +106,12 @@ export default {
     this.draw();
   },
   methods: {
-    checkWindowResize() {
-      let innerWidth = window.innerWidth;
-      this.width = innerWidth;
-      if (innerWidth >= 1150 && innerWidth < 1200) {
-        this.updateWindowResizeData(innerWidth, 16, 10, 25);
-      } else if (innerWidth >= 1100 && innerWidth < 1150) {
-        this.updateWindowResizeData(innerWidth, 16, 10, 0);
-      } else if (innerWidth >= 1050 && innerWidth < 1100) {
-        this.updateWindowResizeData(innerWidth, 15, 10, 10);
-      } else if (innerWidth >= 1000 && innerWidth < 1050) {
-        this.updateWindowResizeData(innerWidth, 15, 7, 0);
-      } else if (innerWidth >= 950 && innerWidth < 1000) {
-        this.updateWindowResizeData(innerWidth, 14, 8, 0);
-      } else if (innerWidth >= 900 && innerWidth < 950) {
-        this.updateWindowResizeData(innerWidth, 14, 5, 0);
-      } else if (innerWidth >= 850 && innerWidth < 900) {
-        this.updateWindowResizeData(innerWidth, 13, 5, 10);
-      } else if (innerWidth >= 800 && innerWidth < 850) {
-        this.updateWindowResizeData(innerWidth, 13, 3, 0);
-      } else if (innerWidth >= 750 && innerWidth < 800) {
-        this.updateWindowResizeData(innerWidth, 12, 3, 0);
-      } else if (innerWidth >= 700 && innerWidth < 750) {
-        this.updateWindowResizeData(innerWidth, 11, 3, 5);
-      } else if (innerWidth >= 650 && innerWidth < 700) {
-        this.updateWindowResizeData(innerWidth, 10, 3, 10);
-      } else if (innerWidth >= 600 && innerWidth < 650) {
-        this.updateWindowResizeData(innerWidth, 10, 3, 0);
-      } else if (innerWidth >= 550 && innerWidth < 600) {
-        this.updateWindowResizeData(innerWidth, 9, 2, 0);
-      } else if (innerWidth >= 500 && innerWidth < 550) {
-        this.updateWindowResizeData(innerWidth, 8, 2, 0);
-      } else if (innerWidth >= 450 && innerWidth < 500) {
-        this.updateWindowResizeData(innerWidth, 8, 2, 0);
-      } else if (innerWidth >= 400 && innerWidth < 450) {
-        this.updateWindowResizeData(innerWidth, 7, 2, 0);
-      } else if (innerWidth >= 350 && innerWidth < 400) {
-        this.updateWindowResizeData(innerWidth, 6, 2, 0);
-      } else if (innerWidth >= 300 && innerWidth < 350) {
-        this.updateWindowResizeData(innerWidth, 5, 2, 0);
-      } else if (innerWidth < 300) {
-        this.updateWindowResizeData(innerWidth, 4, 2, 0);
-      } else {
-        this.updateWindowResizeData(1200, 17, 10, 5);
-      }
-      if (this.ctx !== null) {
-        this.setPaddleLocation();
-        this.setBallLocation();
-        this.initBricks();
-        this.draw();
-      }
-    },
-    updateWindowResizeData(
-      canvasWidth,
-      brickColumnCount,
-      brickPadding,
-      canvasPaddingLeft
-    ) {
-      this.canvasWidth = canvasWidth;
-      this.brickColumnCount = brickColumnCount;
-      this.brickPadding = brickPadding;
-      this.canvasPaddingLeft = canvasPaddingLeft;
-    },
-    start() {
-      if (!this.isGameOver) {
-        if (this.paused) {
-          this.changeButtonText("Duraklat");
-          this.changePauseStatus(false);
-          this.draw();
-        } else {
-          this.changeButtonText("Başlat");
-          this.changePauseStatus(true);
-        }
-      } else {
-        this.changeButtonText("Duraklat");
-        this.isGameOver = false;
-        this.changePauseStatus(false);
-        this.resetGameData();
-      }
-    },
-    resetGameData() {
-      this.level = 1;
-      this.score = 0;
-      this.lives = 3;
-      this.ballSpeedX = 3;
-      this.ballSpeedY = -3;
-      this.setPaddleLocation();
-      this.setBallLocation();
-      this.initBricks();
-      this.draw();
-    },
     setSoundFile() {
       this.brickSound = new Audio(BrickSoundEffect);
-    },
-    playBrickSound() {
-      if (this.brickSound.paused) {
-        this.brickSound.play();
-      } else {
-        this.brickSound.currentTime = 0;
-      }
     },
     setBallImage() {
       this.ball = new Image();
       this.ball.src = ballImage;
-    },
-    generateRandomBallXNumber() {
-      return Math.floor(Math.random() * 21) - 10;
     },
     setBallLocation() {
       this.ballX = this.canvasWidth / 2 + this.generateRandomBallXNumber();
@@ -233,7 +132,40 @@ export default {
       document.addEventListener("touchmove", this.touchMoveHandler);
       window.addEventListener("resize", this.checkWindowResize);
     },
+    keyDownHandler(e) {
+      if (e.keyCode === 39) {
+        this.rightPresses = true;
+      } else if (e.keyCode === 37) {
+        this.leftPresses = true;
+      }
+    },
 
+    keyUpHandler(e) {
+      if (e.keyCode === 39) {
+        this.rightPresses = false;
+      } else if (e.keyCode === 37) {
+        this.leftPresses = false;
+      }
+    },
+    mouseMoveHandler(e) {
+      var relativeX = e.clientX - this.canvas.offsetLeft;
+
+      if (
+        relativeX > this.paddleWidth / 2 &&
+        relativeX < this.canvasWidth - this.paddleWidth / 2
+      ) {
+        this.paddleX = relativeX - this.paddleWidth / 2;
+      }
+    },
+    touchMoveHandler(e) {
+      var relativeX = Math.floor(e.touches[0].clientX);
+      if (
+        relativeX > 0 &&
+        relativeX < this.canvasWidth - this.paddleWidth / 2
+      ) {
+        this.paddleX = relativeX;
+      }
+    },
     initBricks() {
       for (let row = 0; row < this.brickRowCount; row++) {
         this.bricks[row] = [];
@@ -246,6 +178,15 @@ export default {
           };
         }
       }
+    },
+    getRandomColor() {
+      let randomNumber = Math.floor(
+        Math.random() * Math.floor(this.brickColors.length)
+      );
+      let gradientColor = this.ctx.createLinearGradient(0, 0, 0, 150);
+      gradientColor.addColorStop(0, this.brickColors[randomNumber].color1);
+      gradientColor.addColorStop(1, this.brickColors[randomNumber].color2);
+      return gradientColor;
     },
     draw() {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -337,49 +278,6 @@ export default {
         }
       }
     },
-    getRandomColor() {
-      let randomNumber = Math.floor(
-        Math.random() * Math.floor(this.brickColors.length)
-      );
-      let gradientColor = this.ctx.createLinearGradient(0, 0, 0, 150);
-      gradientColor.addColorStop(0, this.brickColors[randomNumber].color1);
-      gradientColor.addColorStop(1, this.brickColors[randomNumber].color2);
-      return gradientColor;
-    },
-    keyDownHandler(e) {
-      if (e.keyCode === 39) {
-        this.rightPresses = true;
-      } else if (e.keyCode === 37) {
-        this.leftPresses = true;
-      }
-    },
-
-    keyUpHandler(e) {
-      if (e.keyCode === 39) {
-        this.rightPresses = false;
-      } else if (e.keyCode === 37) {
-        this.leftPresses = false;
-      }
-    },
-    mouseMoveHandler(e) {
-      var relativeX = e.clientX - this.canvas.offsetLeft;
-
-      if (
-        relativeX > this.paddleWidth / 2 &&
-        relativeX < this.canvasWidth - this.paddleWidth / 2
-      ) {
-        this.paddleX = relativeX - this.paddleWidth / 2;
-      }
-    },
-    touchMoveHandler(e) {
-      var relativeX = Math.floor(e.touches[0].clientX);
-      if (
-        relativeX > 0 &&
-        relativeX < this.canvasWidth - this.paddleWidth / 2
-      ) {
-        this.paddleX = relativeX;
-      }
-    },
     drawBall() {
       this.ctx.drawImage(
         this.ball,
@@ -402,7 +300,22 @@ export default {
       this.ctx.fill();
       this.ctx.closePath();
     },
+    drawScore() {
+      this.ctx.font = "16px Arial";
+      this.ctx.fillStyle = "#FFFFFF";
+      this.ctx.fillText("Skor:" + this.score, 8, 20);
+    },
 
+    drawLives() {
+      this.ctx.font = "16px Arial";
+      this.ctx.fillStyle = "#FFFFFF";
+      this.ctx.fillText("Hak:" + this.lives, this.canvasWidth - 65, 20);
+    },
+    drawLevel() {
+      this.ctx.font = "16px Arial";
+      this.ctx.fillStyle = "#FFFFFF";
+      this.ctx.fillText("Seviye:" + this.level, this.canvasWidth / 2 - 30, 20);
+    },
     collisionDetection() {
       for (let row = 0; row < this.brickRowCount; row++) {
         for (let col = 0; col < this.brickColumnCount; col++) {
@@ -416,7 +329,7 @@ export default {
             ) {
               this.ballSpeedY = -this.ballSpeedY;
               brick.status = 0;
-              this.increaseScore()
+              this.increaseScore();
               this.playBrickSound();
 
               if (this.score === 1) {
@@ -453,6 +366,45 @@ export default {
         }
       }
     },
+    start() {
+      if (!this.isGameOver) {
+        if (this.paused) {
+          this.changeButtonText("Duraklat");
+          this.changePauseStatus(false);
+          this.draw();
+        } else {
+          this.changeButtonText("Başlat");
+          this.changePauseStatus(true);
+        }
+      } else {
+        this.changeButtonText("Duraklat");
+        this.isGameOver = false;
+        this.changePauseStatus(false);
+        this.resetGameData();
+      }
+    },
+    resetGameData() {
+      this.level = 1;
+      this.score = 0;
+      this.lives = 3;
+      this.ballSpeedX = 3;
+      this.ballSpeedY = -3;
+      this.setPaddleLocation();
+      this.setBallLocation();
+      this.initBricks();
+      this.draw();
+    },
+    playBrickSound() {
+      if (this.brickSound.paused) {
+        this.brickSound.play();
+      } else {
+        this.brickSound.currentTime = 0;
+      }
+    },
+    generateRandomBallXNumber() {
+      return Math.floor(Math.random() * 21) - 10;
+    },
+
     changeButtonText(text) {
       this.$refs["startBtn"].innerText = text;
     },
@@ -481,21 +433,67 @@ export default {
     showWarning(warning) {
       this.warning = warning;
     },
-    drawScore() {
-      this.ctx.font = "16px Arial";
-      this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Skor:" + this.score, 8, 20);
-    },
 
-    drawLives() {
-      this.ctx.font = "16px Arial";
-      this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Hak:" + this.lives, this.canvasWidth - 65, 20);
+    checkWindowResize() {
+      let innerWidth = window.innerWidth;
+      if (innerWidth >= 1150 && innerWidth < 1200) {
+        this.updateWindowResizeData(innerWidth, 16, 10, 25);
+      } else if (innerWidth >= 1100 && innerWidth < 1150) {
+        this.updateWindowResizeData(innerWidth, 16, 10, 0);
+      } else if (innerWidth >= 1050 && innerWidth < 1100) {
+        this.updateWindowResizeData(innerWidth, 15, 10, 10);
+      } else if (innerWidth >= 1000 && innerWidth < 1050) {
+        this.updateWindowResizeData(innerWidth, 15, 7, 0);
+      } else if (innerWidth >= 950 && innerWidth < 1000) {
+        this.updateWindowResizeData(innerWidth, 14, 8, 0);
+      } else if (innerWidth >= 900 && innerWidth < 950) {
+        this.updateWindowResizeData(innerWidth, 14, 5, 0);
+      } else if (innerWidth >= 850 && innerWidth < 900) {
+        this.updateWindowResizeData(innerWidth, 13, 5, 10);
+      } else if (innerWidth >= 800 && innerWidth < 850) {
+        this.updateWindowResizeData(innerWidth, 13, 3, 0);
+      } else if (innerWidth >= 750 && innerWidth < 800) {
+        this.updateWindowResizeData(innerWidth, 12, 3, 0);
+      } else if (innerWidth >= 700 && innerWidth < 750) {
+        this.updateWindowResizeData(innerWidth, 11, 3, 5);
+      } else if (innerWidth >= 650 && innerWidth < 700) {
+        this.updateWindowResizeData(innerWidth, 10, 3, 10);
+      } else if (innerWidth >= 600 && innerWidth < 650) {
+        this.updateWindowResizeData(innerWidth, 10, 3, 0);
+      } else if (innerWidth >= 550 && innerWidth < 600) {
+        this.updateWindowResizeData(innerWidth, 9, 2, 0);
+      } else if (innerWidth >= 500 && innerWidth < 550) {
+        this.updateWindowResizeData(innerWidth, 8, 2, 0);
+      } else if (innerWidth >= 450 && innerWidth < 500) {
+        this.updateWindowResizeData(innerWidth, 8, 2, 0);
+      } else if (innerWidth >= 400 && innerWidth < 450) {
+        this.updateWindowResizeData(innerWidth, 7, 2, 0);
+      } else if (innerWidth >= 350 && innerWidth < 400) {
+        this.updateWindowResizeData(innerWidth, 6, 2, 0);
+      } else if (innerWidth >= 300 && innerWidth < 350) {
+        this.updateWindowResizeData(innerWidth, 5, 2, 0);
+      } else if (innerWidth < 300) {
+        this.updateWindowResizeData(innerWidth, 4, 2, 0);
+      } else {
+        this.updateWindowResizeData(1200, 17, 10, 5);
+      }
+      if (this.ctx !== null) {
+        this.setPaddleLocation();
+        this.setBallLocation();
+        this.initBricks();
+        this.draw();
+      }
     },
-    drawLevel() {
-      this.ctx.font = "16px Arial";
-      this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText("Seviye:" + this.level, this.canvasWidth / 2 - 30, 20);
+    updateWindowResizeData(
+      canvasWidth,
+      brickColumnCount,
+      brickPadding,
+      canvasPaddingLeft
+    ) {
+      this.canvasWidth = canvasWidth;
+      this.brickColumnCount = brickColumnCount;
+      this.brickPadding = brickPadding;
+      this.canvasPaddingLeft = canvasPaddingLeft;
     }
   }
 };
