@@ -7,7 +7,7 @@
         class="btn btn-info btn-lg btn3d"
         @click="start()"
         ref="startBtn"
-      >Başlat {{ brickColumnCount }}</button>
+      >Başlat {{ width }}</button>
     </div>
     <div class="modal-overlay">
       <div class="modal">
@@ -32,8 +32,8 @@ export default {
       ctx: null,
       ballX: null,
       ballY: null,
-      ballSpeedX: 1,
-      ballSpeedY: -1,
+      ballSpeedX: 5,
+      ballSpeedY: -5,
       ballRadius: 15,
       paddleHeight: 15,
       paddleWidth: 120,
@@ -42,10 +42,9 @@ export default {
       rightPresses: false,
       leftPresses: false,
       brickRowCount: 3,
-      brickColumnCount: 20,
+      brickColumnCount: 17,
       brickHeight: 30,
-      brickMaxWidth: 60,
-      brickMinWidth: 30,
+      brickWidth: 60,
       brickPadding: 10,
       brickOffsetTop: 30,
       brickOffsetLeft: 10,
@@ -95,7 +94,8 @@ export default {
           color1: "#f7971e",
           color2: "#ffd200"
         }
-      ]
+      ],
+      width: 0
     };
   },
   created() {
@@ -114,8 +114,9 @@ export default {
   methods: {
     checkWindowResize() {
       let innerWidth = window.innerWidth;
+      this.width = innerWidth;
       if (innerWidth >= 1100 && innerWidth < 1200) {
-        this.updateWindowResizeData(innerWidth, 17, 9, 30);
+        this.updateWindowResizeData(innerWidth, 18, 9, 30);
       } else if (innerWidth >= 1000 && innerWidth < 1100) {
         this.updateWindowResizeData(innerWidth, 16, 8, 25);
       } else if (innerWidth >= 900 && innerWidth < 1000) {
@@ -137,7 +138,7 @@ export default {
         this.updateWindowResizeData(innerWidth, 5, 5, 10);
         this.messageFontSize = "12px";
       } else {
-        this.updateWindowResizeData(1200, 20, 10, 30);
+        this.updateWindowResizeData(1200, 17, 10, 30);
       }
       if (this.ctx !== null) {
         this.setPaddleLocation();
@@ -161,16 +162,16 @@ export default {
       if (!this.isGameOver) {
         if (this.paused) {
           this.changeButtonText("Duraklat");
-          this.changePauseStatus(false)
+          this.changePauseStatus(false);
           this.draw();
         } else {
           this.changeButtonText("Başlat");
-          this.changePauseStatus(true)
+          this.changePauseStatus(true);
         }
       } else {
         this.changeButtonText("Duraklat");
         this.isGameOver = false;
-        this.changePauseStatus(false)
+        this.changePauseStatus(false);
         this.resetGameData();
       }
     },
@@ -202,12 +203,6 @@ export default {
     generateRandomBallXNumber() {
       return Math.floor(Math.random() * 21) - 10;
     },
-    generateRandomBrickWidth() {
-      return Math.floor(
-        Math.random() * (this.brickMinWidth - this.brickMaxWidth + 1) +
-          this.brickMaxWidth
-      );
-    },
     setBallLocation() {
       this.ballX = this.canvasWidth / 2 + this.generateRandomBallXNumber();
       this.ballY = this.canvasHeight - 30;
@@ -227,31 +222,14 @@ export default {
       document.addEventListener("touchmove", this.touchMoveHandler);
       window.addEventListener("resize", this.checkWindowResize);
     },
-    checkTotalBrickWidth(row, col) {
-      let brickRandomWidth = this.generateRandomBrickWidth();
-      let total = this.getTotalWidth(row, col);
-      if (total === col * this.brickMaxWidth) {
-        this.checkTotalBrickWidth(row, col);
-      }
-      {
-        return brickRandomWidth;
-      }
-    },
+
     initBricks() {
       for (let row = 0; row < this.brickRowCount; row++) {
         this.bricks[row] = [];
         for (let col = 0; col < this.brickColumnCount; col++) {
-          let brickRandomWidth = null;
-
-          if (col >= (this.brickColumnCount * 2) / 3) {
-            brickRandomWidth = this.checkTotalBrickWidth(row, col);
-          } else {
-            brickRandomWidth = this.generateRandomBrickWidth();
-          }
           this.bricks[row][col] = {
             x: 0,
             y: 0,
-            width: brickRandomWidth,
             status: 1,
             color: this.getRandomColor()
           };
@@ -282,7 +260,7 @@ export default {
         } else {
           this.decreaseLives();
           if (this.lives > 0) {
-            this.changePauseStatus(true)
+            this.changePauseStatus(true);
             this.ballSpeedY = -this.ballSpeedY;
             this.setBallLocation();
             this.setPaddleLocation();
@@ -294,16 +272,16 @@ export default {
             );
             setTimeout(() => {
               this.draw();
-              this.changePauseStatus(true)
+              this.changePauseStatus(true);
             }, 1000);
             setTimeout(() => {
-              this.changePauseStatus(false)
+              this.changePauseStatus(false);
               this.draw();
             }, 2000);
           } else {
             this.changeButtonText("Yeniden Oyna");
             setTimeout(() => {
-              this.changePauseStatus(true)
+              this.changePauseStatus(true);
             }, 100);
             this.isGameOver = true;
             this.drawMessage(
@@ -340,40 +318,22 @@ export default {
       for (let row = 0; row < this.brickRowCount; row++) {
         for (let col = 0; col < this.brickColumnCount; col++) {
           if (this.bricks[row][col].status === 1) {
-            let brickX = null;
-            if (col > 0) {
-              brickX =
-                this.getTotalWidth(row, col) +
-                col * this.brickOffsetLeft +
-                this.canvasPaddingLeft;
-            } else {
-              brickX = this.canvasPaddingLeft;
-            }
+            let brickX =
+              col * (this.brickWidth + this.brickPadding) +
+              this.brickOffsetLeft;
             let brickY =
               row * (this.brickHeight + this.brickPadding) +
               this.brickOffsetTop;
             this.bricks[row][col].x = brickX;
             this.bricks[row][col].y = brickY;
             this.ctx.beginPath();
-            this.ctx.rect(
-              brickX,
-              brickY,
-              this.bricks[row][col].width,
-              this.brickHeight
-            );
+            this.ctx.rect(brickX, brickY, this.brickWidth, this.brickHeight);
             this.ctx.fillStyle = this.bricks[row][col].color;
             this.ctx.fill();
             this.ctx.closePath();
           }
         }
       }
-    },
-    getTotalWidth(rowNumber, colNumber) {
-      let totalBrickWidth = 0;
-      for (let col = 0; col < colNumber; col++) {
-        totalBrickWidth += this.bricks[rowNumber][col].width;
-      }
-      return totalBrickWidth;
     },
     getRandomColor() {
       let randomNumber = Math.floor(
@@ -448,7 +408,7 @@ export default {
           if (brick.status === 1) {
             if (
               this.ballX > brick.x &&
-              this.ballX < brick.x + brick.width &&
+              this.ballX < brick.x + this.brickWidth &&
               this.ballY > brick.y &&
               this.ballY < brick.y + this.brickHeight
             ) {
@@ -462,7 +422,7 @@ export default {
                 if (this.level === this.maxLevel) {
                   this.changeButtonText("Yeniden Oyna");
                   this.isGameOver = true;
-                  this.changePauseStatus(true)
+                  this.changePauseStatus(true);
                   this.drawMessage(
                     "#d32f2f",
                     "Oyunu kazandınız.Tebrikler,Tüm seviyeleri başarıyla tamamladınız.",
@@ -476,7 +436,7 @@ export default {
                   this.increaseBallSpeed();
                   this.setBallLocation();
                   this.setPaddleLocation();
-                  this.changePauseStatus(true)
+                  this.changePauseStatus(true);
                   this.drawMessage(
                     "#d32f2f",
                     "Level " +
@@ -485,7 +445,7 @@ export default {
                     this.canvasWidth / 2 - 200
                   );
                   setTimeout(() => {
-                    this.changePauseStatus(false)
+                    this.changePauseStatus(false);
                     this.draw();
                   }, 3000);
                 }
@@ -503,8 +463,8 @@ export default {
         this.lives--;
       }
     },
-    changePauseStatus(status){
-       this.paused=status
+    changePauseStatus(status) {
+      this.paused = status;
     },
     increaseLevel() {
       this.level++;
