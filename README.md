@@ -1,24 +1,27 @@
-# breakout
+# Breakout Game
 
-## Project setup
+**Breakout, Vue JS kullanılarak geliştirilmiş bir oyundur.**
+
+![breakout-game](https://user-images.githubusercontent.com/25087769/80650406-9fcfe080-8a7c-11ea-8c50-fadb7280d15d.png)
+
+## Kullanılan Teknolojiler
+* Vue JS
+* Canvas
+* HTML 5
+* CSS 3
+
+
+## Oyun Bağlantı Adresi
+* [Breakout Game](https://breakoutgame-v.firebaseapp.com/)
+
+## Kurulum
+
+#### Proje kurulumu
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+#### Projeyi çalıştırma
 ```
 npm run serve
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
