@@ -32,8 +32,8 @@ export default {
       ctx: null,
       ballX: null,
       ballY: null,
-      ballSpeedX: 5,
-      ballSpeedY: -5,
+      ballSpeedX: 1,
+      ballSpeedY: -1,
       ballRadius: 15,
       paddleHeight: 15,
       paddleWidth: 120,
@@ -259,7 +259,7 @@ export default {
       }
     },
     draw() {
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight); //Her konum değiştirildiğinden cancas yenile
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.drawBricks();
       this.drawBall();
       this.drawPaddle();
@@ -280,9 +280,7 @@ export default {
         ) {
           this.ballSpeedY = -this.ballSpeedY;
         } else {
-          if (this.lives > 0) {
-            this.lives--;
-          }
+          this.decreaseLives();
           if (this.lives > 0) {
             this.paused = true;
             this.ballSpeedY = -this.ballSpeedY;
@@ -294,7 +292,6 @@ export default {
               "Kalan Hakkınız:" + this.lives,
               this.canvasWidth / 2 - 60
             );
-
             setTimeout(() => {
               this.draw();
               this.paused = true;
@@ -413,8 +410,13 @@ export default {
       }
     },
     touchMoveHandler(e) {
-      var x = e.touches[0].clientX;
-      this.paddleX = x;
+      var relativeX = Math.floor(e.touches[0].clientX);
+      if (
+        relativeX > 0 &&
+        relativeX < this.canvasWidth - this.paddleWidth / 2
+      ) {
+        this.paddleX = relativeX;
+      }
     },
     drawBall() {
       this.ctx.drawImage(
@@ -496,6 +498,11 @@ export default {
     changeButtonText(text) {
       this.$refs["startBtn"].innerText = text;
     },
+    decreaseLives() {
+      if (this.lives > 0) {
+        this.lives--;
+      }
+    },
     increaseLevel() {
       this.level++;
     },
@@ -534,7 +541,7 @@ export default {
 </script>
 <style>
 body {
-    background: #c94b4b;
+  background: #c94b4b;
   background: -webkit-linear-gradient(to left, #4b134f, #c94b4b);
   background: linear-gradient(to left, #4b134f, #c94b4b);
 }
@@ -547,7 +554,7 @@ body {
   display: block;
   margin: 0 auto;
   cursor: pointer;
-  border-bottom:10px solid #ffffff;
+  border-bottom: 10px solid #ffffff;
 }
 #options {
   margin-top: 1em;
