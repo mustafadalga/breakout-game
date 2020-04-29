@@ -332,7 +332,7 @@ export default {
               this.increaseScore();
               this.playBrickSound();
 
-              if (this.score === 1) {
+              if (this.score === this.brickRowCount*this.brickColumnCount) {
                 if (this.level === this.maxLevel) {
                   this.changeButtonText("Yeniden Oyna");
                   this.isGameOver = true;
