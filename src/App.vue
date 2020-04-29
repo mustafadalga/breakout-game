@@ -190,8 +190,8 @@ export default {
       this.level = 1;
       this.score = 0;
       this.lives = 3;
-      this.ballSpeedX = 5;
-      this.ballSpeedY = 5;
+      this.ballSpeedX = 3;
+      this.ballSpeedY = -3;
       this.setPaddleLocation();
       this.setBallLocation();
       this.initBricks();
@@ -283,7 +283,7 @@ export default {
             }, 1000);
             setTimeout(() => {
               this.changePauseStatus(false);
-              this.showWarning(null)
+              this.showWarning(null);
               this.draw();
             }, 2000);
           } else {
@@ -416,8 +416,7 @@ export default {
             ) {
               this.ballSpeedY = -this.ballSpeedY;
               brick.status = 0;
-              this.score++;
-
+              this.increaseScore()
               this.playBrickSound();
 
               if (this.score === 1) {
@@ -464,6 +463,9 @@ export default {
     },
     changePauseStatus(status) {
       this.paused = status;
+    },
+    increaseScore() {
+      this.score++;
     },
     increaseLevel() {
       this.level++;
