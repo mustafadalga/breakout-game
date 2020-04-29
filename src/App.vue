@@ -3,14 +3,9 @@
     <canvas id="gameCanvas" :width="canvasWidth" :height="canvasHeight"></canvas>
 
     <div id="options">
-      <button
-        type="button"
-        class="btn btn-info btn-lg btn3d"
-        @click="start()"
-        ref="startBtn"
-      >Başlat {{ width }}</button>
+      <button type="button" class="btn btn-info btn-lg btn3d" @click="start()" ref="startBtn">Başlat</button>
     </div>
-       
+    <div id="warning" v-if="warning">{{warning}}</div>
     <div class="modal-overlay">
       <div class="modal">
         <h2>Lütfen cihazını çevirin !</h2>
@@ -18,7 +13,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import ballImage from "./assets/img/football-ball.png";
 import BrickSoundEffect from "./assets/sound/brick-effect.mp3";
@@ -30,12 +24,12 @@ export default {
       canvasWidth: 1200,
       canvasHeight: 400,
       canvasPaddingLeft: 15,
-      messageFontSize: "18px",
+      warning: null,
       ctx: null,
       ballX: null,
       ballY: null,
-      ballSpeedX: 5,
-      ballSpeedY: -5,
+      ballSpeedX: 3,
+      ballSpeedY: -3,
       ballRadius: 15,
       paddleHeight: 15,
       paddleWidth: 120,
@@ -117,45 +111,45 @@ export default {
       let innerWidth = window.innerWidth;
       this.width = innerWidth;
       if (innerWidth >= 1150 && innerWidth < 1200) {
-        this.updateWindowResizeData(innerWidth, 16, 10, 25, 18);
+        this.updateWindowResizeData(innerWidth, 16, 10, 25);
       } else if (innerWidth >= 1100 && innerWidth < 1150) {
-        this.updateWindowResizeData(innerWidth, 16, 10, 0, 18);
+        this.updateWindowResizeData(innerWidth, 16, 10, 0);
       } else if (innerWidth >= 1050 && innerWidth < 1100) {
-        this.updateWindowResizeData(innerWidth, 15, 10, 10, 18);
+        this.updateWindowResizeData(innerWidth, 15, 10, 10);
       } else if (innerWidth >= 1000 && innerWidth < 1050) {
-        this.updateWindowResizeData(innerWidth, 15, 7, 0, 18);
+        this.updateWindowResizeData(innerWidth, 15, 7, 0);
       } else if (innerWidth >= 950 && innerWidth < 1000) {
-        this.updateWindowResizeData(innerWidth, 14, 8, 0, 18);
+        this.updateWindowResizeData(innerWidth, 14, 8, 0);
       } else if (innerWidth >= 900 && innerWidth < 950) {
-        this.updateWindowResizeData(innerWidth, 14, 5, 0, 18);
+        this.updateWindowResizeData(innerWidth, 14, 5, 0);
       } else if (innerWidth >= 850 && innerWidth < 900) {
-        this.updateWindowResizeData(innerWidth, 13, 5, 10, 18);
+        this.updateWindowResizeData(innerWidth, 13, 5, 10);
       } else if (innerWidth >= 800 && innerWidth < 850) {
-        this.updateWindowResizeData(innerWidth, 13, 3, 0, 18);
+        this.updateWindowResizeData(innerWidth, 13, 3, 0);
       } else if (innerWidth >= 750 && innerWidth < 800) {
-        this.updateWindowResizeData(innerWidth, 12, 3, 0, 18);
+        this.updateWindowResizeData(innerWidth, 12, 3, 0);
       } else if (innerWidth >= 700 && innerWidth < 750) {
-        this.updateWindowResizeData(innerWidth, 11, 3, 5, 18);
+        this.updateWindowResizeData(innerWidth, 11, 3, 5);
       } else if (innerWidth >= 650 && innerWidth < 700) {
-        this.updateWindowResizeData(innerWidth, 10, 3, 10, 18);
+        this.updateWindowResizeData(innerWidth, 10, 3, 10);
       } else if (innerWidth >= 600 && innerWidth < 650) {
-        this.updateWindowResizeData(innerWidth, 10, 3, 0, 14);
+        this.updateWindowResizeData(innerWidth, 10, 3, 0);
       } else if (innerWidth >= 550 && innerWidth < 600) {
-        this.updateWindowResizeData(innerWidth, 9, 2, 0, 14);
+        this.updateWindowResizeData(innerWidth, 9, 2, 0);
       } else if (innerWidth >= 500 && innerWidth < 550) {
-        this.updateWindowResizeData(innerWidth, 8, 2, 0, 12);
+        this.updateWindowResizeData(innerWidth, 8, 2, 0);
       } else if (innerWidth >= 450 && innerWidth < 500) {
-        this.updateWindowResizeData(innerWidth, 8, 2, 0, 12);
+        this.updateWindowResizeData(innerWidth, 8, 2, 0);
       } else if (innerWidth >= 400 && innerWidth < 450) {
-        this.updateWindowResizeData(innerWidth, 7, 2, 0, 12);
+        this.updateWindowResizeData(innerWidth, 7, 2, 0);
       } else if (innerWidth >= 350 && innerWidth < 400) {
-        this.updateWindowResizeData(innerWidth, 6, 2, 0, 12);
+        this.updateWindowResizeData(innerWidth, 6, 2, 0);
       } else if (innerWidth >= 300 && innerWidth < 350) {
-        this.updateWindowResizeData(innerWidth, 5, 2, 0, 12);
+        this.updateWindowResizeData(innerWidth, 5, 2, 0);
       } else if (innerWidth < 300) {
-        this.updateWindowResizeData(innerWidth, 4, 2, 0, 12);
+        this.updateWindowResizeData(innerWidth, 4, 2, 0);
       } else {
-        this.updateWindowResizeData(1200, 17, 10, 5, 18);
+        this.updateWindowResizeData(1200, 17, 10, 5);
       }
       if (this.ctx !== null) {
         this.setPaddleLocation();
@@ -168,14 +162,12 @@ export default {
       canvasWidth,
       brickColumnCount,
       brickPadding,
-      canvasPaddingLeft,
-      fontSize
+      canvasPaddingLeft
     ) {
       this.canvasWidth = canvasWidth;
       this.brickColumnCount = brickColumnCount;
       this.brickPadding = brickPadding;
       this.canvasPaddingLeft = canvasPaddingLeft;
-      this.messageFontSize = fontSize + "px";
     },
     start() {
       if (!this.isGameOver) {
@@ -284,30 +276,21 @@ export default {
             this.setBallLocation();
             this.setPaddleLocation();
 
-            this.drawMessage(
-              "#d32f2f",
-              "Kalan Hakkınız:" + this.lives,
-              this.canvasWidth / 2 - 60
-            );
+            this.showWarning("Kalan hakkınız:" + this.lives);
             setTimeout(() => {
               this.draw();
               this.changePauseStatus(true);
             }, 1000);
             setTimeout(() => {
               this.changePauseStatus(false);
+              this.showWarning(null)
               this.draw();
             }, 2000);
           } else {
             this.changeButtonText("Yeniden Oyna");
-            setTimeout(() => {
-              this.changePauseStatus(true);
-            }, 100);
+            this.changePauseStatus(true);
             this.isGameOver = true;
-            this.drawMessage(
-              "#d32f2f",
-              "Tüm haklarınız tükendi.Oyunu kaybettiniz.",
-              this.canvasWidth / 2 - 120
-            );
+            this.showWarning("Tüm haklarınız tükendi.Oyunu kaybettiniz.");
           }
         }
       }
@@ -442,10 +425,8 @@ export default {
                   this.changeButtonText("Yeniden Oyna");
                   this.isGameOver = true;
                   this.changePauseStatus(true);
-                  this.drawMessage(
-                    "#d32f2f",
-                    "Oyunu kazandınız.Tebrikler,Tüm seviyeleri başarıyla tamamladınız.",
-                    this.canvasWidth / 2 - 230
+                  this.showWarning(
+                    "Tebrikler! Tüm seviyeleri başarıyla tamamladınız."
                   );
                 } else {
                   this.increaseLevel();
@@ -456,15 +437,14 @@ export default {
                   this.setBallLocation();
                   this.setPaddleLocation();
                   this.changePauseStatus(true);
-                  this.drawMessage(
-                    "#d32f2f",
+                  this.showWarning(
                     "Level " +
                       (this.level - 1) +
-                      " Tamamlandı.Sonraki Level'e geçiş yapılıyor...",
-                    this.canvasWidth / 2 - 200
+                      " Tamamlandı.Sonraki level'e geçiş yapılıyor..."
                   );
                   setTimeout(() => {
                     this.changePauseStatus(false);
+                    this.showWarning(null);
                     this.draw();
                   }, 3000);
                 }
@@ -496,11 +476,8 @@ export default {
       this.ballSpeedY = -this.ballSpeedY;
       this.ballSpeedY -= 1;
     },
-    drawMessage(color, message, LocationX) {
-      this.ctx.beginPath();
-      this.ctx.font = this.messageFontSize + " Arial";
-      this.ctx.fillStyle = "#FFFFFF";
-      this.ctx.fillText(message, LocationX, this.canvasHeight - 50);
+    showWarning(warning) {
+      this.warning = warning;
     },
     drawScore() {
       this.ctx.font = "16px Arial";
@@ -538,6 +515,22 @@ body {
   cursor: pointer;
   border-bottom: 10px solid #ffffff;
 }
+#warning {
+  height: 32px;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #ffffff;
+  margin-top: 1em;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  padding: 0.5em;
+}
+
 #options {
   margin-top: 1em;
   display: flex;
