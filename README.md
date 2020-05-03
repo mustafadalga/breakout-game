@@ -1,8 +1,9 @@
 # Breakout Game
 
 **Breakout, Vue JS kullanılarak geliştirilmiş bir oyundur.**
+![breakout-game](https://user-images.githubusercontent.com/25087769/80916048-e9f7e100-8d5e-11ea-8f2c-9d3fd86de011.gif)
 
-![breakout-game](https://user-images.githubusercontent.com/25087769/80650406-9fcfe080-8a7c-11ea-8c50-fadb7280d15d.png)
+ 
 
 ## Kullanılan Teknolojiler
 * Vue JS
